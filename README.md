@@ -148,9 +148,14 @@ AI: （品質基準を確認せず実装開始）
 ## フォルダ構成
 
 ```
-export-DD-know-how/
+dd-know-how/
 ├── README.md                 # このファイル
+├── IMPORT.md                 # インポート規約
 ├── quick-start.md            # 5分で始める最小手順
+│
+├── .claude/
+│   └── commands/
+│       └── setup.md          # /setup コマンド（外部プロジェクトへの導入）
 │
 ├── level-1-minimal/          # Level 1: 最小構成
 │   ├── README.md
@@ -185,6 +190,46 @@ export-DD-know-how/
     ├── README.md             # 実例の一覧と解説
     ├── dd-feature-implementation.md   # 機能実装DDサンプル
     └── dd-architecture-decision.md    # 設計判断DDサンプル
+```
+
+## 外部プロジェクトへの導入
+
+自分のプロジェクトにDD設計書の仕組みを導入する方法です。
+
+### 方法1: /setup コマンドを使用（推奨）
+
+dd-know-how リポジトリで Claude Code を起動し、`/setup` コマンドで対話的にセットアップできます。
+
+```bash
+cd dd-know-how
+claude
+# Claude Code 内で
+/setup /path/to/your-project
+```
+
+セットアップ時に以下を選択できます:
+- **導入レベル**: Level 1〜3
+- **DDフォルダの配置先**: `docs/DD/` または `doc/DD/`（既存フォルダを自動検出）
+
+### 方法2: 手動セットアップ
+
+手動でファイルをコピーする場合は、インポート規約を参照してください。
+
+→ [IMPORT.md](IMPORT.md)
+
+### 推奨フォルダ構造（導入後）
+
+```
+your-project/
+├── .claude/
+│   └── commands/
+│       └── dd.md           # /dd コマンド（Level 2以上）
+├── docs/
+│   ├── DD/                 # DD設計書
+│   ├── templates/
+│   │   └── dd_template.md
+│   └── archived/DD/        # アーカイブ済みDD
+└── CLAUDE.md
 ```
 
 ## 各レベルの詳細
