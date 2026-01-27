@@ -1,6 +1,12 @@
-# DD設計書ノウハウ
+# DD-Know-How
 
-DD（Design Document）設計書は、開発における**意思決定を記録するドキュメント**です。
+DD（Design Document）設計書による開発管理と、品質を担保するためのエージェント・スキル集です。
+
+## 特徴
+
+- **DDドリブン開発**: 意思決定の記録 + タスク管理 + ログを一元化
+- **品質エージェント**: TDD、コードレビュー、セキュリティ監査を自動化
+- **ワークフロー**: 5ステップ（Standard）または9ステップ（Full）の開発フロー
 
 ## なぜDDを使うのか
 
@@ -9,7 +15,6 @@ DD（Design Document）設計書は、開発における**意思決定を記録�
 - 「なぜこの設計にしたんだっけ？」→ 3ヶ月後に思い出せない
 - 「この機能、仕様書に書いてある？」→ 実装と仕様がズレている
 - 「今どこまで進んでるの？」→ タスクの進捗が見えない
-- 「前に検討したはずだけど...」→ 同じ議論を繰り返す
 
 ### DDで解決
 
@@ -21,63 +26,97 @@ DDは「意思決定の記録」＋「タスク管理」＋「ログ」を1つ�
    DD作成  検討内容 決定事項 ログ追記 アーカイブ
 ```
 
-### 実際の効果（導入事例）
+## フォルダ構成
 
-あるプロジェクトでは、DD運用を導入した結果：
-
-- **26個のDD**を作成・消化（機能実装、設計判断、規約策定など）
-- **仕様書との乖離ゼロ**を達成（アーカイブ時の同期チェック）
-- **「なぜこうした？」への即答**が可能に（ログセクションで追跡）
-- **新メンバーの立ち上げが高速化**（DDを読めば経緯がわかる）
-
-## AIのガードレールとしてのDD
-
-DDは人間のためだけでなく、**生成AIと協働する際のガードレール**として機能します。
-
-### 生成AIの特性と課題
-
-生成AIには以下の特性があります：
-
-| 特性 | 説明 |
-|------|------|
-| **指示実行力** | 指示されたことは高精度で実行する |
-| **忘却リスク** | 長いコンテキストで手順や基準を忘れることがある |
-| **確認スキップ** | 重要なステップを飛ばして先に進むことがある |
-
-### ワークフロー化が解決すること
-
-DDをワークフロー化することで、生成AIの弱点を補完できます：
-
-| 課題 | DD/ワークフローによる解決 |
-|------|-------------------------|
-| 品質基準を忘れる | 各ステップでゲートチェックを強制 |
-| 現在地を見失う | 進捗表示で「今どこにいるか」を明示 |
-| 確認を飛ばす | 実装前チェック・仕様書同期を必須化 |
-| 手戻りが発生 | 依存関係順のPhase分割で積み上げ式実装 |
-
-### 具体例
-
-**DDなしの場合：**
 ```
-ユーザー: 「ログイン機能を実装して」
-AI: （品質基準を確認せず実装開始）
-→ テストなし、型定義なし、仕様書未更新のまま「完了」
-→ 後から問題発覚、手戻り発生
+dd-know-how/
+├── .claude/
+│   └── commands/           # スラッシュコマンド定義
+│       ├── dd.md           # /dd - DD管理
+│       ├── plan.md         # /plan - 計画立案
+│       ├── tdd.md          # /tdd - テスト駆動開発
+│       ├── code-review.md  # /code-review - レビュー
+│       ├── review.md       # /review - 規約チェック
+│       └── review-spec.md  # /review-spec - 実装前チェック
+├── agents/                 # エージェント定義
+│   ├── planner.md          # 計画立案
+│   ├── tdd-guide.md        # TDDガイド
+│   ├── code-reviewer.md    # コードレビュー
+│   ├── security-reviewer.md # セキュリティ監査
+│   ├── database-reviewer.md # DB設計・最適化
+│   └── architect.md        # アーキテクチャ設計
+├── skills/                 # スキル（言語別パターン集）
+│   ├── typescript/
+│   │   ├── backend.md      # バックエンドパターン
+│   │   └── frontend.md     # フロントエンドパターン
+│   └── python/
+│       └── streamlit.md    # Streamlitパターン
+├── rules/
+│   └── dd-basic-rules.md   # DD基本ルール
+├── templates/
+│   └── dd_template.md      # DDテンプレート
+├── docs/                   # ドキュメント
+│   ├── development-flow.md       # Standard（5ステップ）
+│   ├── development-flow-full.md  # Full（9ステップ）
+│   ├── spec-sync-check.md        # 仕様書同期チェック
+│   ├── customization/            # カスタマイズガイド
+│   └── examples/                 # 実例集
+├── CLAUDE.md               # プロジェクト設定テンプレート
+├── IMPORT.md               # 外部プロジェクトへの導入手順
+└── README.md               # このファイル
 ```
 
-**DDありの場合：**
-```
-/dd new ログイン機能
-→ 品質チェックリストを自動表示
-→ 「テスト計画がありません」と警告
-→ Phase順に実装（型定義 → ロジック → UI → テスト）
-→ 各Phase完了時にゲートチェック
-→ 仕様書同期チェック後にアーカイブ
+## クイックスタート
+
+### 1. このリポジトリをクローン
+
+```bash
+git clone https://github.com/xxx/dd-know-how.git
+cd dd-know-how
 ```
 
-### 進捗表示の意義
+### 2. Claude Code を起動
 
-進捗表示は単なる「見栄え」ではなく、**コンテキストの維持**に不可欠です。
+```bash
+claude
+```
+
+### 3. DD を作成
+
+```
+/dd new ログイン機能の実装
+```
+
+## 利用可能なコマンド
+
+| コマンド | 説明 |
+|---------|------|
+| `/dd new タイトル` | 新規DD作成 |
+| `/dd status` | 現在の進捗を表示 |
+| `/dd list` | DD一覧を表示 |
+| `/dd log メモ` | DDにログを追記 |
+| `/dd archive 番号` | DDをアーカイブ |
+| `/plan` | 実装計画を立案 |
+| `/tdd` | テスト駆動開発を開始 |
+| `/code-review` | コードレビューを実行 |
+| `/review` | 規約チェックを実行 |
+| `/review-spec` | 実装前チェックを検証 |
+
+## 開発フロー
+
+### Standard（5ステップ）
+
+日常的な開発タスク向け。
+
+1. **DD作成** - タスクの目的と背景を記録
+2. **実装** - コーディング
+3. **テスト** - テスト作成・実行
+4. **レビュー** - コードレビュー
+5. **コミット・アーカイブ** - 完了処理
+
+### Full（9ステップ）
+
+重要な機能開発向け。仕様確認・実装前チェック・仕様書同期を追加。
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -89,116 +128,34 @@ AI: （品質基準を確認せず実装開始）
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-この表示により：
-- AIが「今何をすべきか」を忘れない
-- 飛ばしたステップがあれば気づける
-- セッションが中断しても再開が容易
+詳細は [docs/development-flow-full.md](docs/development-flow-full.md) を参照。
 
-### 品質ゲートの意義
+## エージェント
 
-品質ゲートは「通過儀礼」ではなく、**次のステップに進む準備ができているかの確認**です。
+| エージェント | 用途 | 呼び出し例 |
+|-------------|------|-----------|
+| `planner` | 実装計画の立案 | `/plan` |
+| `tdd-guide` | テスト駆動開発 | `/tdd` |
+| `code-reviewer` | コード品質レビュー | `/code-review` |
+| `security-reviewer` | セキュリティ監査 | 直接呼び出し |
+| `database-reviewer` | DB設計・クエリ最適化 | 直接呼び出し |
+| `architect` | アーキテクチャ設計 | 直接呼び出し |
 
-ゲートを設けることで：
-- 不完全な状態で次に進まない
-- 問題を早期に発見
-- 後戻りコストを最小化
+## スキル（言語別パターン集）
 
-### ワークフローの本質的価値
+| 言語 | ファイル | 内容 |
+|------|---------|------|
+| TypeScript | `typescript/backend.md` | API設計、リポジトリパターン、キャッシュ、認証 |
+| TypeScript | `typescript/frontend.md` | コンポーネント設計、状態管理、パフォーマンス最適化 |
+| Python | `python/streamlit.md` | Streamlitアプリ開発パターン |
 
-**ワークフローは制約ではなく、AIとの協働を成功させる「レール」です。**
-
-| 観点 | 効果 |
-|------|------|
-| 一貫性 | 毎回同じ品質基準でチェック |
-| 追跡可能性 | 判断経緯を後から振り返れる |
-| 安全性 | 重要なステップを飛ばさない |
-| 効率性 | 手戻りを最小化 |
-
-## 前提条件
-
-- **推奨**: Claude Code
-- **対応**: 他のAIアシスタント（ChatGPT, Copilot, Cursor, Windsurf等）
-- **可能**: 手動運用（Level 1のみ）
-
-他のAI環境での使用方法は [customization/other-environments.md](customization/other-environments.md) を参照。
-
-## 何が得られるか
-
-| 効果 | 説明 |
-|------|------|
-| **判断の追跡可能性** | なぜこの設計にしたか、後から振り返れる |
-| **タスク管理の一元化** | 1つのDDで計画→実装→完了まで追跡 |
-| **開発フローの標準化** | チーム全体で一貫したプロセス |
-| **仕様書との整合性** | 実装と仕様のズレを防止 |
-
-## 導入レベル
-
-段階的に導入できる3つのレベルを用意しています。
-
-| レベル | 内容 | 導入時間 | 推奨対象 |
-|--------|------|---------|---------|
-| **Level 1** | DDテンプレート + 基本ルール | 5分 | まず試したい人 |
-| **Level 2** | + スラッシュコマンド + 開発フロー | 30分 | 本格運用したい人 |
-| **Level 3** | + 仕様書連携 + 全コマンド | 2時間 | 完全移植したい人 |
-
-## クイックスタート
-
-**5分で始める**: [quick-start.md](quick-start.md)
-
-## フォルダ構成
-
-```
-dd-know-how/
-├── README.md                 # このファイル
-├── IMPORT.md                 # インポート規約
-├── quick-start.md            # 5分で始める最小手順
-│
-├── .claude/
-│   └── commands/
-│       └── setup.md          # /setup コマンド（外部プロジェクトへの導入）
-│
-├── level-1-minimal/          # Level 1: 最小構成
-│   ├── README.md
-│   ├── templates/
-│   │   └── dd_template.md    # DDテンプレート
-│   └── rules/
-│       └── dd-basic-rules.md # 基本ルール
-│
-├── level-2-standard/         # Level 2: 標準構成
-│   ├── README.md
-│   ├── CLAUDE.md.snippet     # CLAUDE.mdに追記するスニペット
-│   ├── commands/
-│   │   └── dd.md             # /dd コマンド定義
-│   └── development-flow.md   # 開発フロー（5ステップ）
-│
-├── level-3-full/             # Level 3: フル構成
-│   ├── README.md
-│   ├── commands/
-│   │   ├── dd.md             # /dd コマンド（仕様書連携付き）
-│   │   ├── review.md         # /review コマンド（規約チェック）
-│   │   └── review-spec.md    # /review-spec コマンド（実装前チェック検証）
-│   ├── development-flow-9steps.md  # 開発フロー（9ステップ）
-│   └── spec-sync-check.md    # 仕様書同期チェック詳細
-│
-├── customization/            # カスタマイズガイド
-│   ├── README.md
-│   ├── template-sections.md  # テンプレートのセクション追加例
-│   ├── development-flow-variants.md  # フローのステップ数調整
-│   └── other-environments.md # Claude Code以外の環境での使用
-│
-└── examples/                 # 実例集
-    ├── README.md             # 実例の一覧と解説
-    ├── dd-feature-implementation.md   # 機能実装DDサンプル
-    └── dd-architecture-decision.md    # 設計判断DDサンプル
-```
+新しい言語・フレームワークを追加する場合は `skills/{言語}/` にファイルを追加してください。
 
 ## 外部プロジェクトへの導入
 
-自分のプロジェクトにDD設計書の仕組みを導入する方法です。
+自分のプロジェクトに DD-Know-How を導入する方法：
 
-### 方法1: /setup コマンドを使用（推奨）
-
-dd-know-how リポジトリで Claude Code を起動し、`/setup` コマンドで対話的にセットアップできます。
+### /setup コマンドを使用（推奨）
 
 ```bash
 cd dd-know-how
@@ -207,130 +164,42 @@ claude
 /setup /path/to/your-project
 ```
 
-セットアップ時に以下を選択できます:
-- **導入レベル**: Level 1〜3
-- **DDフォルダの配置先**: `docs/DD/` または `doc/DD/`（既存フォルダを自動検出）
+手動セットアップの詳細は [IMPORT.md](IMPORT.md) を参照。
 
-### 方法2: 手動セットアップ
-
-手動でファイルをコピーする場合は、インポート規約を参照してください。
-
-→ [IMPORT.md](IMPORT.md)
-
-### 推奨フォルダ構造（導入後）
+### 導入後のフォルダ構造
 
 ```
 your-project/
 ├── .claude/
 │   └── commands/
-│       └── dd.md           # /dd コマンド（Level 2以上）
+│       ├── dd.md
+│       ├── plan.md
+│       ├── tdd.md
+│       └── code-review.md
+├── agents/
+├── skills/
 ├── docs/
 │   ├── DD/                 # DD設計書
 │   ├── templates/
-│   │   └── dd_template.md
-│   └── archived/DD/        # アーカイブ済みDD
+│   └── archived/DD/
 └── CLAUDE.md
 ```
 
-## 各レベルの詳細
-
-### Level 1: 最小構成
-
-**得られるもの:**
-- 意思決定を記録する習慣
-- タスク管理の一元化
-- 判断経緯の追跡可能性
-
-**含まれるもの:**
-- DDテンプレート（汎用版）
-- ファイル命名規則
-- タスクステータスの管理方法
-
-→ [level-1-minimal/README.md](level-1-minimal/README.md)
-
-### Level 2: 標準構成
-
-**Level 1に加えて得られるもの:**
-- スラッシュコマンドによる一貫した操作
-- 開発フローとDDの統合
-- 進捗の可視化
-
-**含まれるもの:**
-- `/dd` コマンド定義
-- 5ステップ開発フロー
-- CLAUDE.mdスニペット
-
-→ [level-2-standard/README.md](level-2-standard/README.md)
-
-### Level 3: フル構成
-
-**Level 2に加えて得られるもの:**
-- DDと仕様書の整合性担保
-- 実装前チェックの習慣化
-- 詳細な開発フロー（9ステップ）
-
-**含まれるもの:**
-- 仕様書同期チェック
-- 9ステップ開発フロー
-- 拡張版コマンド
-
-→ [level-3-full/README.md](level-3-full/README.md)
-
 ## カスタマイズ
 
-プロジェクトに合わせて調整したい場合は、カスタマイズガイドを参照してください。
-
-- テンプレートのセクション追加・削除
-- 開発フローのステップ数調整
-- コマンド名の変更
-- Claude Code以外の環境での使用（ChatGPT, Copilot, 手動運用）
-
-→ [customization/README.md](customization/README.md)
+- テンプレートのカスタマイズ: [docs/customization/template-sections.md](docs/customization/template-sections.md)
+- フローのカスタマイズ: [docs/customization/development-flow-variants.md](docs/customization/development-flow-variants.md)
+- 他のAI環境での使用: [docs/customization/other-environments.md](docs/customization/other-environments.md)
 
 ## 複数人での運用
 
 チームでDDを運用する場合、識別子プレフィックスで番号衝突を防げます。
 
-### 識別子プレフィックス方式
-
-各メンバーが1〜3文字の識別子を決め、DD番号の前に付与：
-
 | メンバー | 識別子 | DD番号例 |
 |----------|--------|----------|
 | 石森 | I | DDI-001, DDI-002 |
 | 斉藤 | SA | DDSA-001, DDSA-002 |
-| 鈴木 | SU | DDSU-001, DDSU-002 |
-
-### 設定方法（Claude Code）
-
-CLAUDE.mdに以下を追記：
-
-```markdown
-## DD設定
-- 作業者識別子: I（石森）
-- DD作成時は `DDI-{番号}_{タイトル}.md` 形式を使用
-```
-
-### 運用ルール
-
-- 識別子はチーム内で重複しないよう管理
-- 識別子の一覧をプロジェクトのどこかに記載しておくと良い
-
-## DDが向かないケース
-
-- 10分以内で終わる単純タスク
-- 意思決定を伴わない定型作業
-- 一人で完結し、後から振り返る必要がない作業
-
-## 実例
-
-実際のプロジェクトで使用されたDDの例（匿名化済み）を参照できます。
-
-- 機能実装DD: 画面追加や機能追加の例
-- 設計判断DD: アーキテクチャ決定の例
-
-→ [examples/](examples/)
 
 ## ライセンス
 
-このノウハウ集は自由に使用・改変できます（MIT License）。
+MIT License
