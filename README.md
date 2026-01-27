@@ -55,7 +55,7 @@ dd-know-how/
 │   └── dd-basic-rules.md   # DD基本ルール
 ├── templates/
 │   └── dd_template.md      # DDテンプレート
-├── docs/                   # ドキュメント
+├── doc/                   # ドキュメント
 │   ├── development-flow.md       # Standard（5ステップ）
 │   ├── development-flow-full.md  # Full（9ステップ）
 │   ├── spec-sync-check.md        # 仕様書同期チェック
@@ -128,7 +128,7 @@ claude
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-詳細は [docs/development-flow-full.md](docs/development-flow-full.md) を参照。
+詳細は [doc/development-flow-full.md](doc/development-flow-full.md) を参照。
 
 ## エージェント
 
@@ -178,7 +178,7 @@ your-project/
 │       └── code-review.md
 ├── agents/
 ├── skills/
-├── docs/
+├── doc/
 │   ├── DD/                 # DD設計書
 │   ├── templates/
 │   └── archived/DD/
@@ -187,9 +187,9 @@ your-project/
 
 ## カスタマイズ
 
-- テンプレートのカスタマイズ: [docs/customization/template-sections.md](docs/customization/template-sections.md)
-- フローのカスタマイズ: [docs/customization/development-flow-variants.md](docs/customization/development-flow-variants.md)
-- 他のAI環境での使用: [docs/customization/other-environments.md](docs/customization/other-environments.md)
+- テンプレートのカスタマイズ: [doc/customization/template-sections.md](doc/customization/template-sections.md)
+- フローのカスタマイズ: [doc/customization/development-flow-variants.md](doc/customization/development-flow-variants.md)
+- 他のAI環境での使用: [doc/customization/other-environments.md](doc/customization/other-environments.md)
 
 ## 複数人での運用
 

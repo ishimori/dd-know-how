@@ -28,7 +28,7 @@ doc/
 ### 例1: docsフォルダを使用
 
 ```
-docs/
+doc/
 ├── design-documents/
 ├── archived/
 │   └── design-documents/
@@ -83,7 +83,7 @@ doc/spec/
 ### 例: 英語フォルダ名
 
 ```
-docs/spec/
+doc/spec/
 ├── overview.md
 ├── features.md
 ├── screens/

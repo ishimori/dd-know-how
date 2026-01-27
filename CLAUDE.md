@@ -5,8 +5,8 @@
 ## DD設定
 
 - **フロー**: full（9ステップ）
-- **DDフォルダ**: `docs/DD/`
-- **アーカイブ**: `docs/archived/DD/`
+- **DDフォルダ**: `doc/DD/`
+- **アーカイブ**: `doc/archived/DD/`
 - **テンプレート**: `templates/dd_template.md`
 
 ## 利用可能なコマンド
@@ -68,7 +68,7 @@
 8. 仕様書同期
 9. コミット・アーカイブ
 
-詳細は `docs/development-flow.md` または `docs/development-flow-full.md` を参照。
+詳細は `doc/development-flow.md` または `doc/development-flow-full.md` を参照。
 
 ## プロジェクト固有の設定
 

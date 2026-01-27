@@ -43,9 +43,9 @@
 
 対象プロジェクトのフォルダ構造を確認し、以下の優先順位で提案:
 
-1. `docs/` フォルダが存在 → `docs/DD/` を提案
+1. `doc/` フォルダが存在 → `doc/DD/` を提案
 2. `doc/` フォルダが存在 → `doc/DD/` を提案
-3. どちらもない → `docs/DD/`（推奨）または `doc/DD/` を選択させる
+3. どちらもない → `doc/DD/`（推奨）または `doc/DD/` を選択させる
 
 **ユーザーに確認**: 「DDフォルダを {提案パス} に作成します。よろしいですか？」
 
@@ -58,7 +58,7 @@
 #### Level 1（最小構成）
 ```
 {対象プロジェクト}/
-├── {DDフォルダ}/              # 例: docs/DD/
+├── {DDフォルダ}/              # 例: doc/DD/
 │   └── (空、またはサンプルDD)
 ├── {DDフォルダ}/../templates/
 │   └── dd_template.md        # ← level-1-minimal/templates/dd_template.md
@@ -83,7 +83,7 @@
 │       ├── dd.md             # ← level-3-full/commands/dd.md（上書き）
 │       ├── review.md         # ← level-3-full/commands/review.md
 │       └── review-spec.md    # ← level-3-full/commands/review-spec.md
-└── {仕様書フォルダ}/          # 例: docs/spec/ （ユーザーに確認）
+└── {仕様書フォルダ}/          # 例: doc/spec/ （ユーザーに確認）
 ```
 
 ### 5. CLAUDE.md の更新
@@ -122,9 +122,9 @@
 
 | 項目 | 推奨パス | 代替パス |
 |------|----------|----------|
-| DDフォルダ | `docs/DD/` | `doc/DD/` |
-| テンプレート | `docs/templates/` | `doc/templates/` |
-| アーカイブ | `docs/archived/DD/` | `doc/archived/DD/` |
+| DDフォルダ | `doc/DD/` | `doc/DD/` |
+| テンプレート | `doc/templates/` | `doc/templates/` |
+| アーカイブ | `doc/archived/DD/` | `doc/archived/DD/` |
 | コマンド | `.claude/commands/` | （固定） |
 
 ## 注意事項

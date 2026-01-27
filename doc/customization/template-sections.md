@@ -173,7 +173,7 @@ DD完了時に学びを記録する場合：
 
 - [セッション管理のベストプラクティス](https://example.com/session)
 - [OWASP認証チートシート](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html)
-- 社内ドキュメント: `docs/security-guidelines.md`
+- 社内ドキュメント: `doc/security-guidelines.md`
 ```
 
 ### 9. レビュー

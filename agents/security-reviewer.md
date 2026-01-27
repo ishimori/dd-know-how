@@ -454,7 +454,7 @@ PRをレビューする際は、インラインコメントを投稿:
 ---
 
 > セキュリティレビューはClaude Code security-reviewer agentによって実施されました
-> 質問はdocs/SECURITY.mdを参照してください
+> 質問はdoc/SECURITY.mdを参照してください
 ```
 
 ## セキュリティレビューを実行するタイミング

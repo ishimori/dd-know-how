@@ -86,7 +86,7 @@ doc/spec/
 
 **カスタム例:**
 ```
-docs/
+doc/
 ├── overview.md
 ├── features.md
 ├── screens/

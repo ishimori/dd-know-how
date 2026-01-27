@@ -23,10 +23,13 @@ your-project/
 │   ├── security-reviewer.md
 │   ├── database-reviewer.md
 │   └── architect.md
-├── skills/                 # スキル（参照資料）
-│   ├── backend-patterns/
-│   └── frontend-patterns/
-├── docs/
+├── skills/                 # スキル（言語別パターン集）
+│   ├── typescript/
+│   │   ├── backend.md
+│   │   └── frontend.md
+│   └── python/
+│       └── streamlit.md
+├── doc/
 │   ├── DD/                 # DD設計書
 │   │   ├── DD-001_xxx.md
 │   │   └── DD-002_xxx.md
@@ -58,13 +61,13 @@ claude
 
 ```bash
 # 対象プロジェクトで実行
-mkdir -p .claude/commands agents skills docs/DD docs/templates docs/archived/DD
+mkdir -p .claude/commands agents skills doc/DD doc/templates doc/archived/DD
 
 # dd-know-how からコピー
 cp dd-know-how/.claude/commands/* .claude/commands/
 cp dd-know-how/agents/* agents/
 cp -r dd-know-how/skills/* skills/
-cp dd-know-how/templates/dd_template.md docs/templates/
+cp dd-know-how/templates/dd_template.md doc/templates/
 cp dd-know-how/CLAUDE.md ./
 
 # CLAUDE.md を編集してプロジェクト固有の設定を追加
@@ -87,7 +90,7 @@ CLAUDE.md 内の設定を `full` に変更:
 
 | 優先度 | パス | 条件 |
 |--------|------|------|
-| 1 | `docs/DD/` | `docs/` フォルダが存在する場合（推奨） |
+| 1 | `doc/DD/` | `doc/` フォルダが存在する場合（推奨） |
 | 2 | `doc/DD/` | `doc/` フォルダが存在する場合 |
 | 3 | カスタム | ユーザー指定 |
 
@@ -95,10 +98,10 @@ CLAUDE.md 内の設定を `full` に変更:
 
 DDフォルダの親ディレクトリを基準に配置:
 
-| 項目 | 相対パス | 例（docs/DD/ の場合） |
+| 項目 | 相対パス | 例（doc/DD/ の場合） |
 |------|----------|------------------------|
-| テンプレート | `../templates/` | `docs/templates/dd_template.md` |
-| アーカイブ | `../archived/DD/` | `docs/archived/DD/` |
+| テンプレート | `../templates/` | `doc/templates/dd_template.md` |
+| アーカイブ | `../archived/DD/` | `doc/archived/DD/` |
 
 ## パス設定のカスタマイズ
 
@@ -108,9 +111,9 @@ DDフォルダの親ディレクトリを基準に配置:
 
 ```markdown
 # 変更前（デフォルト）
-docs/DD/
-docs/templates/dd_template.md
-docs/archived/DD/
+doc/DD/
+doc/templates/dd_template.md
+doc/archived/DD/
 
 # 変更後の例（doc/ を使用する場合）
 doc/DD/
@@ -122,7 +125,7 @@ doc/archived/DD/
 
 ```markdown
 # 変更前
-- **DDフォルダ**: `docs/DD/`
+- **DDフォルダ**: `doc/DD/`
 
 # 変更後の例
 - **DDフォルダ**: `doc/DD/`
