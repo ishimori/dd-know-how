@@ -202,7 +202,7 @@ your-project/
 
 ## 関連プロジェクト
 
-本プロジェクトの一部のエージェント・スキルは [everything-claude-code](https://github.com/tatat/everything-claude-code) から移植しています。
+本プロジェクトの一部のエージェント・スキルは [everything-claude-code](https://github.com/affaan-m/everything-claude-code) から移植しています。
 
 | コンポーネント | 移植元 |
 |---------------|--------|
@@ -212,7 +212,7 @@ your-project/
 | `security-reviewer.md` | everything-claude-code/agents/ |
 | `architect.md` | everything-claude-code/agents/ |
 
-統合の詳細な設計については [dd-integration.md](https://github.com/tatat/everything-claude-code/blob/main/manual/dd-integration/dd-integration.md) を参照してください。
+統合の詳細な設計については [dd-integration.md](https://github.com/ishimori/everything-claud-code/blob/main/manual/dd-integration/dd-integration.md) (private Repository) を参照してください。
 
 ## ライセンス
 
