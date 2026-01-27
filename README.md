@@ -200,6 +200,20 @@ your-project/
 | 石森 | I | DDI-001, DDI-002 |
 | 斉藤 | SA | DDSA-001, DDSA-002 |
 
+## 関連プロジェクト
+
+本プロジェクトの一部のエージェント・スキルは [everything-claude-code](https://github.com/tatat/everything-claude-code) から移植しています。
+
+| コンポーネント | 移植元 |
+|---------------|--------|
+| `planner.md` | everything-claude-code/agents/ |
+| `tdd-guide.md` | everything-claude-code/agents/ |
+| `code-reviewer.md` | everything-claude-code/agents/ |
+| `security-reviewer.md` | everything-claude-code/agents/ |
+| `architect.md` | everything-claude-code/agents/ |
+
+統合の詳細な設計については [dd-integration.md](https://github.com/tatat/everything-claude-code/blob/main/manual/dd-integration/dd-integration.md) を参照してください。
+
 ## ライセンス
 
 MIT License
