@@ -1,3 +1,8 @@
+---
+name: setup
+description: DD設計書セットアップコマンド
+---
+
 # DD設計書セットアップコマンド
 
 外部プロジェクトにDD設計書の仕組みを導入するコマンドです。
@@ -70,8 +75,9 @@
 ```
 {対象プロジェクト}/
 ├── .claude/
-│   └── commands/
-│       └── dd.md             # ← level-2-standard/commands/dd.md
+│   └── skills/
+│       └── dd/
+│           └── SKILL.md      # ← level-2-standard/skills/dd/SKILL.md
 └── CLAUDE.md                 # ← level-2-standard/CLAUDE.md.snippet の内容を追記
 ```
 
@@ -79,10 +85,13 @@
 ```
 {対象プロジェクト}/
 ├── .claude/
-│   └── commands/
-│       ├── dd.md             # ← level-3-full/commands/dd.md（上書き）
-│       ├── review.md         # ← level-3-full/commands/review.md
-│       └── review-spec.md    # ← level-3-full/commands/review-spec.md
+│   └── skills/
+│       ├── dd/
+│       │   └── SKILL.md      # ← level-3-full/skills/dd/SKILL.md（上書き）
+│       ├── review/
+│       │   └── SKILL.md      # ← level-3-full/skills/review/SKILL.md
+│       └── review-spec/
+│           └── SKILL.md      # ← level-3-full/skills/review-spec/SKILL.md
 └── {仕様書フォルダ}/          # 例: doc/spec/ （ユーザーに確認）
 ```
 
@@ -111,7 +120,7 @@
 - DDフォルダ: {DDフォルダパス}
 - テンプレート: {テンプレートパス}
 - アーカイブ: {アーカイブパス}
-- コマンド: {コマンドパス}（Level 2以上）
+- スキル: {スキルパス}（Level 2以上）
 
 【次のステップ】
 1. `/dd new 最初のDD` で新規DDを作成
@@ -125,7 +134,7 @@
 | DDフォルダ | `doc/DD/` | `doc/DD/` |
 | テンプレート | `doc/templates/` | `doc/templates/` |
 | アーカイブ | `doc/archived/DD/` | `doc/archived/DD/` |
-| コマンド | `.claude/commands/` | （固定） |
+| スキル | `.claude/skills/` | （固定） |
 
 ## 注意事項
 

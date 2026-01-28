@@ -9,7 +9,9 @@
 - **アーカイブ**: `doc/archived/DD/`
 - **テンプレート**: `templates/dd_template.md`
 
-## 利用可能なコマンド
+## 利用可能なスキル
+
+> スキルは `.claude/skills/` に配置されています（skills形式）
 
 ### DD管理
 - `/dd new タイトル` - 新規DD作成
@@ -17,6 +19,7 @@
 - `/dd list` - DD一覧
 - `/dd log メモ` - ログ追記
 - `/dd archive 番号` - アーカイブ
+- `/setup パス` - 外部プロジェクトへDD導入
 
 ### 品質管理
 - `/plan` - 実装計画立案（planner エージェント）
@@ -24,6 +27,9 @@
 - `/code-review` - コードレビュー（code-reviewer エージェント）
 - `/review` - 規約チェック
 - `/review-spec` - 実装前チェック検証
+
+### ユーティリティ
+- `/status` - セッションのコンテキスト使用状況を報告（VSCode拡張向け）
 
 ## エージェント
 
@@ -38,7 +44,7 @@
 | `database-reviewer` | DB設計・クエリ最適化 |
 | `architect` | アーキテクチャ設計 |
 
-## スキル（言語別パターン集）
+## 参考パターン集（言語別）
 
 | 言語 | ファイル | 内容 |
 |------|---------|------|
@@ -47,6 +53,12 @@
 | Python | `skills/python/streamlit.md` | Streamlitアプリ開発パターン |
 
 新しい言語を追加する場合は `skills/{言語}/` にファイルを追加。
+
+## コンテキスト管理
+
+- **CLI**: ステータスラインでコンテキスト使用率を常時監視可能
+  - 設定方法: `doc/cli-statusline-setup.md`
+- **VSCode拡張**: `/status` コマンドで確認
 
 ## 開発フロー
 

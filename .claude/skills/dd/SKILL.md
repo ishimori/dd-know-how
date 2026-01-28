@@ -1,3 +1,8 @@
+---
+name: dd
+description: DD設計書操作コマンド（仕様書連携付き）
+---
+
 # DD設計書操作コマンド（仕様書連携付き）
 
 DD（Design Document）設計書を操作するコマンドです。
