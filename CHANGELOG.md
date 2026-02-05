@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+- 実例集に「バグ修正DD（見落としチェック記録付き）」を追加
+  - 見落としチェックの実践例を含む
+  - 各Phaseで問題を発見・対応した記録
+
 ### Changed
 - 自己レビュー → 見落としチェック（Devil's Advocate アプローチ）
   - 「確認したか？」ではなく「何を見落としているか？」を問う形式に変更
