@@ -10,6 +10,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - 実例集に「バグ修正DD（見落としチェック記録付き）」を追加
   - 見落としチェックの実践例を含む
   - 各Phaseで問題を発見・対応した記録
+- Phase 0に「Devil's Advocate調査」タスクを追加
+  - 批判的視点での事前調査を促す
+  - 代替案・リスク・失敗シナリオ・保守性を検討
 
 ### Changed
 - 自己レビュー → 見落としチェック（Devil's Advocate アプローチ）
