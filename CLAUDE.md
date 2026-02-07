@@ -19,6 +19,7 @@
 - `/dd list` - DD一覧
 - `/dd log メモ` - ログ追記
 - `/dd archive 番号` - アーカイブ
+- `/workflow` - 9ステップ開発フロー・Phase管理・DA批判レビュー
 - `/setup パス` - 外部プロジェクトへDD導入
 
 ### 品質管理
