@@ -1,218 +1,240 @@
 # DD-Know-How
 
-DD（Design Document）設計書による開発管理と、品質を担保するためのエージェント・スキル集です。
+**LLMの楽観バイアスを制御し、設計判断を記録し続ける開発フレームワーク**
 
-## 特徴
+Claude Code のスキルとして動作する、DD（Design Document）ドリブンの開発管理システムです。
 
-- **DDドリブン開発**: 意思決定の記録 + タスク管理 + ログを一元化
-- **品質エージェント**: TDD、コードレビュー、セキュリティ監査を自動化
-- **ワークフロー**: 5ステップ（Standard）または9ステップ（Full）の開発フロー
+---
 
-## なぜDDを使うのか
+## 解決する問題
 
-### よくある問題
+AIコーディングアシスタントには構造的な弱点があります。
 
-- 「なぜこの設計にしたんだっけ？」→ 3ヶ月後に思い出せない
-- 「この機能、仕様書に書いてある？」→ 実装と仕様がズレている
-- 「今どこまで進んでるの？」→ タスクの進捗が見えない
+| 問題 | 結果 |
+|------|------|
+| **楽観バイアス** | 「問題ありません」で見落としを素通りする |
+| **コンテキスト忘却** | セッションをまたぐと設計判断の経緯が消える |
+| **場当たり実装** | 全体像なしに目の前のコードだけ書く |
+| **自己レビューの甘さ** | 自分が書いたコードを「正しい」前提で確認する |
 
-### DDで解決
+DD-Know-How はこれらに対して、仕組みで対抗します。
 
-DDは「意思決定の記録」＋「タスク管理」＋「ログ」を1つのファイルにまとめます。
+## 核心: DA批判レビュー（Devil's Advocate）
+
+最大の特徴は **DA批判レビュー** です。各実装フェーズの完了前に、LLMに対して批判的視点を強制します。
 
 ```
-問題発生 → 検討 → 決定 → 実装 → 完了
-    ↓       ↓      ↓      ↓      ↓
-   DD作成  検討内容 決定事項 ログ追記 アーカイブ
+❌「確認したか？」 → 「はい、問題ありません」
+⭕「どこが壊れるか？」 → 壊れる前提で探すしかない
+```
+
+### 4段階の批判手順
+
+1. **壊れる前提で探す** — 「完了した」ではなく「何が壊れるか」と問う
+2. **暗黙の前提を疑う** — 「今動いている」ではなく「前提が崩れるケースは？」
+3. **将来の破壊を予測** — 「今は問題ない」ではなく「半年後の変更で壊れないか？」
+4. **発見を記録** — 何も見つからないのは疑わしい。変更ファイルを読み直して再チェック
+
+### 再チェックの自動発動
+
+発見した問題の重要度に応じて、別角度からの再チェックが自動的に発動します。
+
+- **条件A**: 重要度「中」以上が1件でもあれば → 視点を変えて再チェック必須
+- **条件B**: 発見数が閾値を超えた場合 → まだ潜んでいる前提で再チェック
+
+実際の運用では、Phase 2で重要度「中」の問題が見つかり、別角度の再チェックで同種の問題をもう1件発見する、というケースが繰り返し起きています。条件Aがなければ素通りしていた不具合です。
+
+### 発見の実例
+
+バグ修正DD（[実例](doc/examples/dd-bug-fix-with-review.md)）から抜粋:
+
+```markdown
+### Phase 2 DA批判レビュー
+
+| # | 発見した問題 | 重要度 | DA観点 | 対応 |
+|---|------------|--------|--------|------|
+| 1 | 別ファイルにも同じ誤ったコードが含まれていた | 高 | 依存関係の見落とし | ✅ 修正済 |
+| 2 | JSDoc型定義に新タイプが未追加だった | 中 | エッジケース漏れ | ✅ 追加済 |
+```
+
+「問題なし」ではなく、具体的な問題を探して記録する。これがDA批判レビューの本質です。
+
+## DDとは何か
+
+DDは「意思決定の記録」「タスク管理」「作業ログ」を1つのMarkdownファイルにまとめたものです。
+
+```markdown
+# DD-042: 認証方式の変更
+
+## 目的        ← 何を、なぜやるのか
+## 検討内容    ← どんな選択肢があったか
+## 決定事項    ← 最終的に何を選んだか
+## タスク一覧  ← Phase分割された作業リスト（各PhaseにDA批判レビュー付き）
+## ログ        ← 時系列の作業記録
+## DA批判レビュー記録  ← 各Phaseで「何が壊れるか」を探した記録
+```
+
+DDはセッションをまたいでも残り続けます。3ヶ月後に「なぜこの設計にしたのか」を振り返れる。これが、コンテキストが揮発するLLMとの開発で最も価値を持つ部分です。
+
+## 開発フロー
+
+### 9ステップ（Full）
+
+重要な機能開発向け。仕様確認・実装前チェック・仕様書同期まで含む完全フロー。
+
+```
+Step 1: DD作成          「〇〇機能を作りたい」
+Step 2: 仕様確認        ユーザー承認を得る
+Step 3: 実装前チェック  仕様書・既存コードを確認
+Step 4: コーディング    規約に従って実装
+Step 5: テスト作成      必要に応じてテスト作成
+Step 6: コード検証      Lint + セルフチェック
+Step 7: レビュー        コードレビュー
+Step 8: 仕様書同期      DDの変更を仕様書に反映
+Step 9: コミット        git commit → DDアーカイブ
+```
+
+### 5ステップ（Standard）
+
+日常的なタスク向けの簡易版: DD作成 → 実装 → テスト → レビュー → コミット
+
+## スキル構成
+
+DD-Know-How は役割ごとに分離されたスキルで構成されています。
+
+### コアスキル
+
+| スキル | 役割 |
+|--------|------|
+| `/dd` | DD操作（作成・参照・一覧・アーカイブ）。軽量設計で、DD参照時にワークフロー全体がロードされない |
+| `/workflow` | 9ステップフロー・Phase管理・DA批判レビュー・仕様書同期。開発作業時にオンデマンドでロード |
+
+### 品質管理スキル
+
+| スキル | 役割 |
+|--------|------|
+| `/plan` | 実装前の計画立案。要件確認・リスク評価・段階的計画 |
+| `/tdd` | テスト駆動開発。RED→GREEN→REFACTORサイクルの強制 |
+| `/code-review` | セキュリティ + コード品質の包括レビュー |
+| `/review` | コーディング規約・アーキテクチャ違反の検出 |
+| `/review-spec` | 実装前チェック。仕様書と既存コードの突合 |
+
+### エージェント
+
+Phase完了時のレビューで、内容に応じたエージェントが自動選択されます。
+
+| エージェント | 対象 |
+|-------------|------|
+| `code-reviewer` | 一般的なコード実装 |
+| `security-reviewer` | 認証・API・決済 |
+| `architect` | アーキテクチャ設計 |
+| `database-reviewer` | DB設計・マイグレーション |
+
+## 導入方法
+
+### 自分のプロジェクトに導入する
+
+```bash
+# dd-know-how リポジトリ内で Claude Code を起動
+cd dd-know-how
+claude
+
+# 対象プロジェクトを指定してセットアップ
+> /setup /path/to/your-project
+```
+
+3段階の導入レベルから選択:
+
+| レベル | 内容 |
+|--------|------|
+| Level 1 | テンプレート + 基本ルール。まず試したい場合 |
+| Level 2 | + `/dd` + `/workflow`（DA批判レビュー含む）。通常はこれで十分 |
+| Level 3 | + 仕様書連携 + レビューコマンド。厳密な運用向け |
+
+手動セットアップの詳細は [IMPORT.md](IMPORT.md) を参照。
+
+### DD-Know-How 自体を使う
+
+```bash
+git clone https://github.com/xxx/dd-know-how.git
+cd dd-know-how
+claude
+> /dd new ログイン機能の実装
 ```
 
 ## フォルダ構成
 
 ```
 dd-know-how/
-├── .claude/
-│   └── commands/           # スラッシュコマンド定義
-│       ├── dd.md           # /dd - DD管理
-│       ├── plan.md         # /plan - 計画立案
-│       ├── tdd.md          # /tdd - テスト駆動開発
-│       ├── code-review.md  # /code-review - レビュー
-│       ├── review.md       # /review - 規約チェック
-│       └── review-spec.md  # /review-spec - 実装前チェック
-├── agents/                 # エージェント定義
-│   ├── planner.md          # 計画立案
-│   ├── tdd-guide.md        # TDDガイド
-│   ├── code-reviewer.md    # コードレビュー
-│   ├── security-reviewer.md # セキュリティ監査
-│   ├── database-reviewer.md # DB設計・最適化
-│   └── architect.md        # アーキテクチャ設計
-├── skills/                 # スキル（言語別パターン集）
-│   ├── typescript/
-│   │   ├── backend.md      # バックエンドパターン
-│   │   └── frontend.md     # フロントエンドパターン
-│   └── python/
-│       └── streamlit.md    # Streamlitパターン
-├── rules/
-│   └── dd-basic-rules.md   # DD基本ルール
+├── .claude/skills/          # スキル定義（skills形式）
+│   ├── dd/SKILL.md          # DD操作（軽量版）
+│   ├── workflow/SKILL.md    # 開発フロー・DA批判レビュー
+│   ├── plan/SKILL.md        # 実装計画立案
+│   ├── tdd/SKILL.md         # テスト駆動開発
+│   ├── code-review/SKILL.md # コードレビュー
+│   ├── review/SKILL.md      # 規約チェック
+│   ├── review-spec/SKILL.md # 実装前チェック
+│   ├── setup/SKILL.md       # 外部プロジェクトへの導入
+│   └── status/SKILL.md      # コンテキスト使用状況
+├── agents/                  # エージェント定義
+├── rules/                   # DD基本ルール
+├── skills/                  # 言語別パターン集
+│   ├── typescript/          # バックエンド・フロントエンド
+│   └── python/              # Streamlit
 ├── templates/
-│   └── dd_template.md      # DDテンプレート
-├── doc/                   # ドキュメント
-│   ├── development-flow.md       # Standard（5ステップ）
-│   ├── development-flow-full.md  # Full（9ステップ）
-│   ├── spec-sync-check.md        # 仕様書同期チェック
-│   ├── customization/            # カスタマイズガイド
-│   └── examples/                 # 実例集
-├── CLAUDE.md               # プロジェクト設定テンプレート
-├── IMPORT.md               # 外部プロジェクトへの導入手順
-└── README.md               # このファイル
-```
-
-## クイックスタート
-
-### 1. このリポジトリをクローン
-
-```bash
-git clone https://github.com/xxx/dd-know-how.git
-cd dd-know-how
-```
-
-### 2. Claude Code を起動
-
-```bash
-claude
-```
-
-### 3. DD を作成
-
-```
-/dd new ログイン機能の実装
-```
-
-## 利用可能なコマンド
-
-| コマンド | 説明 |
-|---------|------|
-| `/dd new タイトル` | 新規DD作成 |
-| `/dd status` | 現在の進捗を表示 |
-| `/dd list` | DD一覧を表示 |
-| `/dd log メモ` | DDにログを追記 |
-| `/dd archive 番号` | DDをアーカイブ |
-| `/plan` | 実装計画を立案 |
-| `/tdd` | テスト駆動開発を開始 |
-| `/code-review` | コードレビューを実行 |
-| `/review` | 規約チェックを実行 |
-| `/review-spec` | 実装前チェックを検証 |
-
-## 開発フロー
-
-### Standard（5ステップ）
-
-日常的な開発タスク向け。
-
-1. **DD作成** - タスクの目的と背景を記録
-2. **実装** - コーディング
-3. **テスト** - テスト作成・実行
-4. **レビュー** - コードレビュー
-5. **コミット・アーカイブ** - 完了処理
-
-### Full（9ステップ）
-
-重要な機能開発向け。仕様確認・実装前チェック・仕様書同期を追加。
-
-```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📍 Step 4/9: コーディング
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✅ 1. DD作成       ✅ 2. 仕様確認     ✅ 3. 実装前チェック
-▶️ 4. コーディング  ⬜ 5. テスト作成   ⬜ 6. コード検証
-⬜ 7. レビュー      ⬜ 8. 仕様書同期   ⬜ 9. コミット
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-```
-
-詳細は [doc/development-flow-full.md](doc/development-flow-full.md) を参照。
-
-## エージェント
-
-| エージェント | 用途 | 呼び出し例 |
-|-------------|------|-----------|
-| `planner` | 実装計画の立案 | `/plan` |
-| `tdd-guide` | テスト駆動開発 | `/tdd` |
-| `code-reviewer` | コード品質レビュー | `/code-review` |
-| `security-reviewer` | セキュリティ監査 | 直接呼び出し |
-| `database-reviewer` | DB設計・クエリ最適化 | 直接呼び出し |
-| `architect` | アーキテクチャ設計 | 直接呼び出し |
-
-## スキル（言語別パターン集）
-
-| 言語 | ファイル | 内容 |
-|------|---------|------|
-| TypeScript | `typescript/backend.md` | API設計、リポジトリパターン、キャッシュ、認証 |
-| TypeScript | `typescript/frontend.md` | コンポーネント設計、状態管理、パフォーマンス最適化 |
-| Python | `python/streamlit.md` | Streamlitアプリ開発パターン |
-
-新しい言語・フレームワークを追加する場合は `skills/{言語}/` にファイルを追加してください。
-
-## 外部プロジェクトへの導入
-
-自分のプロジェクトに DD-Know-How を導入する方法：
-
-### /setup コマンドを使用（推奨）
-
-```bash
-cd dd-know-how
-claude
-# Claude Code 内で
-/setup /path/to/your-project
-```
-
-手動セットアップの詳細は [IMPORT.md](IMPORT.md) を参照。
-
-### 導入後のフォルダ構造
-
-```
-your-project/
-├── .claude/
-│   └── commands/
-│       ├── dd.md
-│       ├── plan.md
-│       ├── tdd.md
-│       └── code-review.md
-├── agents/
-├── skills/
+│   └── dd_template.md       # DDテンプレート（DA批判レビュー組み込み済み）
 ├── doc/
-│   ├── DD/                 # DD設計書
-│   ├── templates/
-│   └── archived/DD/
-└── CLAUDE.md
+│   ├── development-flow-full.md  # 9ステップフロー詳細
+│   ├── examples/                 # 実例集（機能実装・設計判断・バグ修正）
+│   ├── customization/            # カスタマイズガイド
+│   └── UPGRADE-NOTICE.md        # 既存導入プロジェクト向けアップグレード手順
+├── CLAUDE.md                # プロジェクト設定テンプレート
+└── IMPORT.md                # 手動導入ガイド
 ```
 
 ## カスタマイズ
 
-- テンプレートのカスタマイズ: [doc/customization/template-sections.md](doc/customization/template-sections.md)
-- フローのカスタマイズ: [doc/customization/development-flow-variants.md](doc/customization/development-flow-variants.md)
-- 他のAI環境での使用: [doc/customization/other-environments.md](doc/customization/other-environments.md)
+- [テンプレートのカスタマイズ](doc/customization/template-sections.md)
+- [開発フローのバリエーション](doc/customization/development-flow-variants.md)
+- [他のAI環境での使用](doc/customization/other-environments.md)
+- [実例集](doc/examples/README.md) — 機能実装・設計判断・バグ修正の実例
+
+## 設計思想
+
+### なぜ「見落としチェック」ではなくDevil's Advocateか
+
+初期バージョンでは「何を見落としているか？」と問う形式でした。しかし実運用で判明したのは、LLMは「見落とし」を問われると「特にありません」と答えがちだということです。
+
+「どこが壊れるか？」と問い方を変えるだけで、LLMは壊れるポイントを探すモードに切り替わります。さらに6項目のDA観点チェックリストと最低発見数ルールで、形式的な「問題なし」を許さない構造にしています。
+
+### DA品質フィルター: ノイズとの戦い
+
+DA批判レビューは意図的に問題を探すため、**誤検出（false positive）** が発生します。実運用で確認された典型的なノイズ:
+
+- 言語仕様の誤解に基づく指摘（事実誤認）
+- 既にTODOコメントや別Phaseで対応予定の事項を再指摘
+- 「壊れるかもしれない」だけで再現手順のない指摘
+
+品質フィルター（検証義務・既知事項除外・深刻度基準・再現手順必須化）でこれらを排除し、DA批判レビューの信号対雑音比（SNR）を高めています。詳細は [workflow/SKILL.md](.claude/skills/workflow/SKILL.md) を参照。
+
+### なぜDDスキルを分割したか
+
+DDスキルは当初428行の単一ファイルでした。DD参照したいだけでワークフロー全体がロードされ、コンテキストを圧迫していました。
+
+DD操作（~120行）とワークフロー管理（~270行）に分離することで、必要な時に必要な分だけロードされる設計になりました。DA批判レビューの強制力はDDテンプレートのタスク項目が担うため、分離しても品質は維持されます。
 
 ## 複数人での運用
 
-チームでDDを運用する場合、識別子プレフィックスで番号衝突を防げます。
+識別子プレフィックスで番号衝突を防ぎます。
 
-| メンバー | 識別子 | DD番号例 |
-|----------|--------|----------|
-| 石森 | I | DDI-001, DDI-002 |
-| 斉藤 | SA | DDSA-001, DDSA-002 |
+```
+DDI-001, DDI-002   # 石森の番号系列
+DDSA-001, DDSA-002 # 斉藤の番号系列
+```
 
 ## 関連プロジェクト
 
-本プロジェクトの一部のエージェント・スキルは [everything-claude-code](https://github.com/affaan-m/everything-claude-code) から移植しています。
-
-| コンポーネント | 移植元 |
-|---------------|--------|
-| `planner.md` | everything-claude-code/agents/ |
-| `tdd-guide.md` | everything-claude-code/agents/ |
-| `code-reviewer.md` | everything-claude-code/agents/ |
-| `security-reviewer.md` | everything-claude-code/agents/ |
-| `architect.md` | everything-claude-code/agents/ |
-
-統合の詳細な設計については [dd-integration.md](https://github.com/ishimori/everything-claud-code/blob/main/manual/dd-integration/dd-integration.md) (private Repository) を参照してください。
+エージェント定義の一部は [everything-claude-code](https://github.com/affaan-m/everything-claude-code) から移植しています。
 
 ## ライセンス
 
