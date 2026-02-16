@@ -175,7 +175,7 @@ claude
 ### DD-Know-How 自体を使う
 
 ```bash
-git clone https://github.com/xxx/dd-know-how.git
+git clone https://github.com/ishimori/dd-know-how.git
 cd dd-know-how
 claude
 > /dd new ログイン機能の実装
