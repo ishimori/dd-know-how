@@ -3,7 +3,6 @@
 Claude Code CLI でコンテキスト使用率を常時監視するための設定方法です。
 
 > **注意**: この機能は **CLI専用** です。VSCode拡張では表示されません。
-> VSCode拡張では `/status` コマンドで代替できます。
 
 ## 概要
 
@@ -126,5 +125,4 @@ module.exports = { getStatusLine };
 
 ## 関連情報
 
-- VSCode拡張ユーザー向け: `/status` コマンドで同等の情報を取得できます
 - コンテキスト管理のベストプラクティス: [context-management.md](./context-management.md)

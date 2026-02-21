@@ -13,31 +13,26 @@
 
 ## 導入レベル
 
-3段階から選択。**まず Level 2 を推奨。**
+2段階から選択。**Level 2 を推奨。**
 
 | レベル | コピーするもの | 得られる機能 |
 |--------|--------------|-------------|
 | Level 1（最小） | テンプレート + 基本ルール | DD手動管理、DAレビュー記録テンプレート |
 | **Level 2（標準）** | + `/dd` + `/workflow` スキル | **DDコマンド操作、DA批判レビュー、Phase管理** |
-| Level 3（フル） | + `/review` + `/review-spec` スキル | 仕様書連携、規約チェック |
 
 ### Level別の機能比較
 
-| コンポーネント | Level 1 | Level 2 | Level 3 |
-|---------------|---------|---------|---------|
-| DDテンプレート（DA批判レビュー組み込み済み） | ✅ | ✅ | ✅ |
-| DD基本ルール | ✅ | ✅ | ✅ |
-| DDフォルダ構造 | ✅ | ✅ | ✅ |
-| `/dd` スキル（作成・参照・一覧・アーカイブ） | - | ✅ | ✅ |
-| `/workflow` スキル（9ステップ・DA批判レビュー・DA品質フィルター） | - | ✅ | ✅ |
-| CLAUDE.md テンプレート | - | ✅ | ✅ |
-| `/review` `/review-spec` スキル | - | - | ✅ |
-| 仕様書同期チェック | - | - | ✅ |
+| コンポーネント | Level 1 | Level 2 |
+|---------------|---------|---------|
+| DDテンプレート（DA批判レビュー組み込み済み） | ✅ | ✅ |
+| DD基本ルール | ✅ | ✅ |
+| DDフォルダ構造 | ✅ | ✅ |
+| `/dd` スキル（作成・参照・一覧・アーカイブ） | - | ✅ |
+| `/workflow` スキル（9ステップ・DA批判レビュー・DA品質フィルター） | - | ✅ |
+| CLAUDE.md テンプレート | - | ✅ |
 
-**オプション（全レベル共通）:**
-- エージェント（`agents/`）— code-reviewer, security-reviewer, architect 等
-- スキル（`skills/`）— 言語別コーディングパターン集
-- 品質管理スキル（`/plan`, `/tdd`, `/code-review`）
+**オプション:**
+- 言語別パターン集（`skills/`）— TypeScript、Python等のコーディングパターン
 
 ## セットアップ
 
@@ -94,43 +89,9 @@ cp dd-know-how/CLAUDE.md ./
 - `/dd archive 番号` — アーカイブ
 - `/workflow` — 9ステップフロー・DA批判レビュー起動
 
-#### Level 3（フル構成）
-
-Level 2 のファイルに加えて:
+#### オプション: 言語別パターン集
 
 ```bash
-# レビュースキルをコピー
-mkdir -p .claude/skills/review .claude/skills/review-spec
-cp dd-know-how/.claude/skills/review/SKILL.md       .claude/skills/review/
-cp dd-know-how/.claude/skills/review-spec/SKILL.md   .claude/skills/review-spec/
-
-# 仕様書フォルダを作成
-mkdir -p doc/spec
-```
-
-CLAUDE.md の開発フローを `full`（9ステップ）に設定。
-
-#### オプション: 品質管理スキル・エージェント・言語パターン
-
-```bash
-# 品質管理スキル（/plan, /tdd, /code-review）
-# ※ /plan と /tdd はそれぞれ対応するエージェントが必要（下記参照）
-mkdir -p .claude/skills/plan .claude/skills/tdd .claude/skills/code-review
-cp dd-know-how/.claude/skills/plan/SKILL.md        .claude/skills/plan/
-cp dd-know-how/.claude/skills/tdd/SKILL.md         .claude/skills/tdd/
-cp dd-know-how/.claude/skills/code-review/SKILL.md .claude/skills/code-review/
-
-# エージェント（品質管理スキル・Phase完了時のレビューで使用）
-# planner.md → /plan に必須、tdd-guide.md → /tdd に必須、code-reviewer.md → /code-review に必須
-mkdir -p agents
-cp dd-know-how/agents/planner.md             agents/  # /plan に必須
-cp dd-know-how/agents/tdd-guide.md           agents/  # /tdd に必須
-cp dd-know-how/agents/code-reviewer.md       agents/  # /code-review に必須
-cp dd-know-how/agents/security-reviewer.md   agents/  # 認証・API開発時
-cp dd-know-how/agents/architect.md           agents/  # 設計判断時
-cp dd-know-how/agents/database-reviewer.md   agents/  # DB設計時
-
-# 言語別パターン集
 cp -r dd-know-how/skills/ skills/
 ```
 
@@ -192,11 +153,6 @@ DDテンプレートの記録テーブルにも品質フィルターのガイド
 - [ ] `/dd list` で一覧が表示される
 - [ ] `/workflow` でフロー管理が起動する
 - [ ] CLAUDE.md にプロジェクト固有の設定が記載されている
-
-### Level 3（Level 2 に加えて）
-- [ ] `/review` が動作する
-- [ ] `/review-spec` が動作する
-- [ ] `doc/spec/` に仕様書フォルダが存在する
 
 ## 既存導入のアップグレード
 
