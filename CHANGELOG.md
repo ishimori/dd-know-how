@@ -7,6 +7,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- GEM分析（独立批判レビュー）を追加
+  - DDの最終Phase完了時に独立した視点からDD全体を批判的レビュー
+  - Gemini API モード: `.env` に `GEMINI_API_KEY` を設定して外部モデルによるレビュー
+  - 別コンテキストDAモード: API未設定時に Task agent でコンテキスト汚染排除レビュー
+  - DDテンプレートに「GEM分析結果」セクションを追加
+  - `.env.example` を追加
 - `/workflow` スキルを新規追加（DDスキルから分離）
   - 9ステップ開発フロー・Phase管理・DA批判レビュー・仕様書同期
   - DDスキルのコンテキスト効率改善（428行→~120行）

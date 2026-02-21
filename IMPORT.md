@@ -10,6 +10,7 @@
 | **DA批判レビュー** | 各Phase完了前に「どこが壊れるか」を強制的に探す。LLMの楽観バイアスに対抗 |
 | **DA品質フィルター** | DAレビューのノイズ（事実誤認・既知事項の再指摘）を4ルールで排除 |
 | **9ステップ開発フロー** | DD作成→仕様確認→実装→テスト→レビュー→仕様書同期→コミットの体系的フロー |
+| **GEM分析** | 最終Phase完了時に独立した外部レビュー。同一コンテキストのバイアスを排除 |
 
 ## 導入レベル
 
@@ -89,6 +90,34 @@ cp dd-know-how/CLAUDE.md ./
 - `/dd archive 番号` — アーカイブ
 - `/workflow` — 9ステップフロー・DA批判レビュー起動
 
+#### オプション: GEM分析の設定
+
+GEM分析は、DDの最終Phase完了時に独立した批判レビューを実行する機能です。
+
+```bash
+# .env.example をコピーして編集
+cp dd-know-how/.env.example your-project/.env
+
+# .gitignore に .env を追加（重要: APIキーをコミットしない）
+echo ".env" >> your-project/.gitignore
+```
+
+**.env の設定内容:**
+
+| 変数 | 必須 | デフォルト | 説明 |
+|------|------|-----------|------|
+| `GEMINI_API_KEY` | いいえ | (なし) | Gemini API キー。[Google AI Studio](https://aistudio.google.com/apikey) で取得 |
+| `GEMINI_MODEL` | いいえ | `gemini-2.5-flash` | 使用するGeminiモデル |
+
+**動作モード:**
+
+| GEMINI_API_KEY | 動作 |
+|----------------|------|
+| 設定あり | Gemini API で独立レビュー（外部モデル） |
+| 設定なし | 別コンテキスト（Task agent）でDA分析（コンテキスト汚染排除） |
+
+いずれの場合も、DDの同一会話コンテキスト内で行われるDA批判レビューの構造的限界を補完します。
+
 #### オプション: 言語別パターン集
 
 ```bash
@@ -104,7 +133,8 @@ your-project/
 │       ├── dd/
 │       │   └── SKILL.md           # DD操作（~120行、軽量）
 │       └── workflow/
-│           └── SKILL.md           # 9ステップフロー・DA批判レビュー（~270行）
+│           └── SKILL.md           # 9ステップフロー・DA批判レビュー・GEM分析
+├── .env                           # GEM分析設定（オプション、.gitignore対象）
 ├── doc/
 │   ├── DD/                        # DD設計書（進行中）
 │   │   ├── DD-001_ログイン機能.md
@@ -153,6 +183,7 @@ DDテンプレートの記録テーブルにも品質フィルターのガイド
 - [ ] `/dd list` で一覧が表示される
 - [ ] `/workflow` でフロー管理が起動する
 - [ ] CLAUDE.md にプロジェクト固有の設定が記載されている
+- [ ] （オプション）`.env` に `GEMINI_API_KEY` を設定した場合、GEM分析が動作する
 
 ## 既存導入のアップグレード
 

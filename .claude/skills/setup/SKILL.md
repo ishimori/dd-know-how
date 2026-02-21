@@ -96,7 +96,29 @@ description: DD設計書セットアップコマンド
 - `doc/templates/` → 実際のテンプレートフォルダパス
 - `doc/archived/DD/` → 実際のアーカイブフォルダパス
 
-### 7. 完了報告
+### 7. GEM分析の設定案内（オプション）
+
+セットアップ完了後、GEM分析の設定について案内する:
+
+```
+【オプション】GEM分析の設定
+
+GEM分析は、DDの最終Phase完了時に外部モデルによる独立批判レビューを実行する機能です。
+
+設定方法:
+1. プロジェクトルートに .env ファイルを作成
+2. Gemini API キーを設定（Google AI Studio で取得: https://aistudio.google.com/apikey）
+
+   GEMINI_API_KEY=your-api-key-here
+   GEMINI_MODEL=gemini-2.5-flash  # 省略時のデフォルト
+
+3. .gitignore に .env を追加
+
+※ GEMINI_API_KEY 未設定でもGEM分析は動作します（別コンテキストDA分析にフォールバック）
+※ 設定例は dd-know-how/.env.example を参照
+```
+
+### 8. 完了報告
 
 セットアップ完了後、以下を表示:
 
@@ -108,6 +130,11 @@ description: DD設計書セットアップコマンド
 - テンプレート: {テンプレートパス}
 - アーカイブ: {アーカイブパス}
 - スキル: {スキルパス}（Level 2以上）
+
+【オプション設定】
+- GEM分析: .env に GEMINI_API_KEY を設定すると有効化
+  （未設定でも別コンテキストDA分析として動作）
+  → 設定例は dd-know-how/.env.example を参照
 
 【次のステップ】
 1. `/dd new 最初のDD` で新規DDを作成

@@ -19,7 +19,7 @@
 - `/dd list` - DD一覧
 - `/dd log メモ` - ログ追記
 - `/dd archive 番号` - アーカイブ
-- `/workflow` - 9ステップ開発フロー・Phase管理・DA批判レビュー
+- `/workflow` - 9ステップ開発フロー・Phase管理・DA批判レビュー・GEM分析
 - `/setup パス` - 外部プロジェクトへDD導入
 
 ## 参考パターン集（言語別）
