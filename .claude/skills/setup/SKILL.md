@@ -41,7 +41,7 @@ description: DD設計書セットアップコマンド
 | レベル | 内容 | 推奨ケース |
 |--------|------|------------|
 | Level 1（最小） | テンプレート + 基本ルール | まず試したい |
-| Level 2（標準） | + /dd コマンド + /workflow（DA批判レビュー含む） | 通常利用 |
+| Level 2（標準） | + /dd コマンド + DA メソッド文書 | 通常利用 |
 
 ### 3. DDフォルダの配置先を決定
 
@@ -75,10 +75,8 @@ description: DD設計書セットアップコマンド
 {対象プロジェクト}/
 ├── .claude/
 │   └── skills/
-│       ├── dd/
-│       │   └── SKILL.md      # ← skills/dd/SKILL.md
-│       └── workflow/
-│           └── SKILL.md      # ← skills/workflow/SKILL.md
+│       └── dd/
+│           └── SKILL.md      # ← skills/dd/SKILL.md
 └── CLAUDE.md                 # ← CLAUDE.md.snippet の内容を追記
 ```
 

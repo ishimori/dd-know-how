@@ -16,8 +16,8 @@ DDスキルの構造とレビュー手法を大幅に改善しました。
 
 | スキル | 行数 | 内容 |
 |--------|------|------|
-| `/dd` | ~120行 | DD操作のみ（参照・作成・一覧・アーカイブ） |
-| `/workflow` | ~270行 | 9ステップフロー・Phase管理・DA批判レビュー・仕様書同期 |
+| `/dd` | ~180行 | DD操作（参照・作成・一覧・検索・アーカイブ） |
+| `doc/da-method.md` | — | DA品質フィルター・再チェック条件・Phase種別チェックリスト |
 
 **メリット:** DD参照だけの時にワークフロー全体がロードされなくなり、コンテキスト消費を削減。
 
@@ -42,7 +42,7 @@ DDスキルの構造とレビュー手法を大幅に改善しました。
 
 ### アップグレード手順
 
-#### Level 2（/dd + /workflow）をお使いの場合
+#### Level 2（/dd + DA メソッド）をお使いの場合
 
 **1. スキルファイルを更新**
 
@@ -52,8 +52,8 @@ DDスキルの構造とレビュー手法を大幅に改善しました。
 dd-know-how/.claude/skills/dd/SKILL.md
   → {プロジェクト}/.claude/skills/dd/SKILL.md（上書き）
 
-dd-know-how/.claude/skills/workflow/SKILL.md
-  → {プロジェクト}/.claude/skills/workflow/SKILL.md（新規）
+dd-know-how/doc/da-method.md
+  → {プロジェクト}/doc/da-method.md（新規）
 ```
 
 **2. テンプレートを更新**
@@ -63,10 +63,10 @@ dd-know-how/templates/dd_template.md
   → {プロジェクト}/{テンプレートフォルダ}/dd_template.md（上書き）
 ```
 
-**3. CLAUDE.mdにworkflowを追記**
+**3. CLAUDE.mdにDA メソッド参照を追記**
 
 ```markdown
-- `/workflow` - 9ステップ開発フロー・Phase管理・DA批判レビュー
+- DA メソッド: `doc/da-method.md`（DA品質フィルター・再チェック条件）
 ```
 
 #### Level 3（フル構成）をお使いの場合

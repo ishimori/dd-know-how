@@ -18,7 +18,7 @@
 | レベル | コピーするもの | 得られる機能 |
 |--------|--------------|-------------|
 | Level 1（最小） | テンプレート + 基本ルール | DD手動管理、DAレビュー記録テンプレート |
-| **Level 2（標準）** | + `/dd` + `/workflow` スキル | **DDコマンド操作、DA批判レビュー、Phase管理** |
+| **Level 2（標準）** | + `/dd` スキル + DA メソッド文書 | **DDコマンド操作、DA批判レビュー、Phase管理** |
 
 ### Level別の機能比較
 
@@ -27,8 +27,8 @@
 | DDテンプレート（DA批判レビュー組み込み済み） | ✅ | ✅ |
 | DD基本ルール | ✅ | ✅ |
 | DDフォルダ構造 | ✅ | ✅ |
-| `/dd` スキル（作成・参照・一覧・アーカイブ） | - | ✅ |
-| `/workflow` スキル（9ステップ・DA批判レビュー・DA品質フィルター） | - | ✅ |
+| `/dd` スキル（作成・参照・一覧・検索・アーカイブ） | - | ✅ |
+| DA メソッド文書（DA品質フィルター・再チェック条件） | - | ✅ |
 | CLAUDE.md テンプレート | - | ✅ |
 
 **オプション:**
@@ -73,9 +73,9 @@ Level 1 のファイルに加えて:
 
 ```bash
 # スキルをコピー
-mkdir -p .claude/skills/dd .claude/skills/workflow
+mkdir -p .claude/skills/dd doc/
 cp dd-know-how/.claude/skills/dd/SKILL.md        .claude/skills/dd/
-cp dd-know-how/.claude/skills/workflow/SKILL.md   .claude/skills/workflow/
+cp dd-know-how/doc/da-method.md                  doc/
 
 # CLAUDE.md をコピーして編集
 cp dd-know-how/CLAUDE.md ./
@@ -87,7 +87,6 @@ cp dd-know-how/CLAUDE.md ./
 - `/dd status` — 進捗確認
 - `/dd list` — DD一覧
 - `/dd archive 番号` — アーカイブ
-- `/workflow` — 9ステップフロー・DA批判レビュー起動
 
 #### オプション: 言語別パターン集
 
@@ -103,8 +102,7 @@ your-project/
 │   └── skills/
 │       ├── dd/
 │       │   └── SKILL.md           # DD操作（~120行、軽量）
-│       └── workflow/
-│           └── SKILL.md           # 9ステップフロー・DA批判レビュー（~270行）
+│       └── (プロジェクト固有のスキルを追加可能)
 ├── doc/
 │   ├── DD/                        # DD設計書（進行中）
 │   │   ├── DD-001_ログイン機能.md
@@ -119,7 +117,7 @@ your-project/
 
 ## DA品質フィルターについて
 
-Level 2 以上で導入される `/workflow` スキルには **DA品質フィルター** が含まれます。DA批判レビュー実行時に自動適用される4ルール:
+Level 2 以上で導入される `doc/da-method.md` には **DA品質フィルター** が含まれます。DA批判レビュー実行時に自動適用される4ルール:
 
 | # | ルール | 目的 |
 |---|--------|------|
@@ -151,7 +149,7 @@ DDテンプレートの記録テーブルにも品質フィルターのガイド
 ### Level 2（Level 1 に加えて）
 - [ ] `/dd new テスト` で DD が `doc/DD/` に作成される
 - [ ] `/dd list` で一覧が表示される
-- [ ] `/workflow` でフロー管理が起動する
+- [ ] `doc/da-method.md` が配置されている
 - [ ] CLAUDE.md にプロジェクト固有の設定が記載されている
 
 ## 既存導入のアップグレード
