@@ -22,16 +22,6 @@
 - DA メソッド: `doc/da-method.md`（DA品質フィルター・再チェック条件）
 - `/setup パス` - 外部プロジェクトへDD導入
 
-## 参考パターン集（言語別）
-
-| 言語 | ファイル | 内容 |
-|------|---------|------|
-| TypeScript | `skills/typescript/backend.md` | バックエンド設計パターン |
-| TypeScript | `skills/typescript/frontend.md` | フロントエンド設計パターン |
-| Python | `skills/python/streamlit.md` | Streamlitアプリ開発パターン |
-
-新しい言語を追加する場合は `skills/{言語}/` にファイルを追加。
-
 ## 開発フロー
 
 ### Standard（5ステップ）

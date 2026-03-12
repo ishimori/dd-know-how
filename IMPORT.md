@@ -31,9 +31,6 @@
 | DA メソッド文書（DA品質フィルター・再チェック条件） | - | ✅ |
 | CLAUDE.md テンプレート | - | ✅ |
 
-**オプション:**
-- 言語別パターン集（`skills/`）— TypeScript、Python等のコーディングパターン
-
 ## セットアップ
 
 ### 方法1: /setup コマンド（推奨）
@@ -87,12 +84,6 @@ cp dd-know-how/CLAUDE.md ./
 - `/dd status` — 進捗確認
 - `/dd list` — DD一覧
 - `/dd archive 番号` — アーカイブ
-
-#### オプション: 言語別パターン集
-
-```bash
-cp -r dd-know-how/skills/ skills/
-```
 
 ## 導入後のフォルダ構造（Level 2）
 

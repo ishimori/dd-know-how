@@ -165,9 +165,6 @@ dd-know-how/
 │   ├── dd/SKILL.md          # DD操作（軽量版）
 │   └── setup/SKILL.md       # 外部プロジェクトへの導入
 ├── rules/                   # DD基本ルール
-├── skills/                  # 言語別パターン集
-│   ├── typescript/          # バックエンド・フロントエンド
-│   └── python/              # Streamlit
 ├── templates/
 │   └── dd_template.md       # DDテンプレート（DA批判レビュー組み込み済み）
 ├── doc/
