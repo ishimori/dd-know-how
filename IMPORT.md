@@ -130,7 +130,7 @@ DDテンプレートの記録テーブルにも品質フィルターのガイド
 
 パスを変更する場合は、`/dd` スキル内のパス参照も合わせて修正してください。
 
-## 検証チェックリスト
+## 検証チェックリスト（必須・スキップ禁止）
 
 ### Level 1
 - [ ] `doc/DD/` フォルダが存在する
@@ -138,10 +138,25 @@ DDテンプレートの記録テーブルにも品質フィルターのガイド
 - [ ] `doc/archived/DD/` フォルダが存在する
 
 ### Level 2（Level 1 に加えて）
-- [ ] `/dd new テスト` で DD が `doc/DD/` に作成される
-- [ ] `/dd list` で一覧が表示される
 - [ ] `doc/da-method.md` が配置されている
 - [ ] CLAUDE.md にプロジェクト固有の設定が記載されている
+
+### パス整合性チェック（Level 2 必須）
+
+CLAUDE.md と SKILL.md 内のパス参照が、実際のファイル配置と一致しているか `ls` で確認する。**不一致がある場合はファイル内のパスを修正してから再確認する。全パスの存在確認が完了するまでセットアップ完了としないこと。**
+
+| # | 検証対象 | 確認内容 |
+|---|---------|---------|
+| 1 | CLAUDE.md の `テンプレート` 行 | 記載パスに `dd_template.md` が存在するか |
+| 2 | SKILL.md の `templates/guides.md` 参照 | 記載パスに `guides.md` が存在するか |
+| 3 | SKILL.md の `doc/da-method.md` 参照 | 記載パスに `da-method.md` が存在するか |
+
+```
+✓ パス整合性チェック:
+  CLAUDE.md テンプレート → doc/templates/dd_template.md  ✓ 存在確認
+  SKILL.md guides.md    → doc/templates/guides.md        ✓ 存在確認
+  SKILL.md da-method.md → doc/da-method.md               ✓ 存在確認
+```
 
 ## 既存導入のアップグレード
 
