@@ -65,7 +65,11 @@ description: DD設計書セットアップコマンド
 ├── {DDフォルダ}/              # 例: doc/DD/
 │   └── (空、またはサンプルDD)
 ├── {DDフォルダ}/../templates/
-│   └── dd_template.md        # ← level-1-minimal/templates/dd_template.md
+│   ├── dd_template.md        # ← templates/dd_template.md
+│   ├── dd_template_tdd.md    # ← templates/dd_template_tdd.md（差分テンプレート）
+│   ├── dd_template_mock.md   # ← templates/dd_template_mock.md（差分テンプレート）
+│   ├── dd_template_e2e.md    # ← templates/dd_template_e2e.md（差分テンプレート）
+│   └── guides.md             # ← templates/guides.md（アプローチ選択ガイド）
 └── {DDフォルダ}/../archived/DD/
     └── (空フォルダ)
 ```

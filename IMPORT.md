@@ -57,8 +57,8 @@ cd your-project
 # フォルダ作成
 mkdir -p doc/DD doc/templates doc/archived/DD
 
-# テンプレートと基本ルールをコピー
-cp dd-know-how/templates/dd_template.md  doc/templates/
+# テンプレート一式と基本ルールをコピー
+cp dd-know-how/templates/*.md  doc/templates/
 cp dd-know-how/rules/dd-basic-rules.md   doc/templates/
 ```
 
