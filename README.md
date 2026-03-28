@@ -161,27 +161,33 @@ claude
 ```
 dd-know-how/
 ├── .claude/skills/
-│   ├── dd/SKILL.md              # DD操作スキル（作成・参照・一覧・アーカイブ）
-│   └── setup/SKILL.md           # 外部プロジェクトへの導入（/setup）
-├── templates/                   # ── /setup でコピーされるファイル群 ──
-│   ├── guides.md                # DD作成ガイド（アプローチ選択・命名・サイズ管理・テスト戦略・エビデンス収集）
-│   ├── dd_template.md           # 標準テンプレート（共通骨格）
-│   ├── dd_template_tdd.md      # TDD差分テンプレート
-│   ├── dd_template_mock.md     # モック先行差分テンプレート
-│   ├── dd_template_e2e.md      # E2E駆動差分テンプレート
-│   └── coding-standards.md     # コーディング基準書（P01〜P22）
+│   ├── dd/SKILL.md                # DD操作スキル（作成・参照・一覧・検索・アーカイブ）
+│   └── setup/SKILL.md             # 外部プロジェクトへの導入（/setup）
+├── templates/                     # ── /setup でコピーされるファイル群 ──
+│   ├── guides.md                  # DD作成ガイド（アプローチ選択・命名・サイズ管理・テスト戦略・エビデンス収集）
+│   ├── dd_template.md             # 標準テンプレート（共通骨格）
+│   ├── dd_template_tdd.md        # TDD差分テンプレート
+│   ├── dd_template_mock.md       # モック先行差分テンプレート
+│   ├── dd_template_e2e.md        # E2E駆動差分テンプレート
+│   ├── coding-standards.md       # コーディング基準書（P01〜P22）
+│   ├── DD-INDEX.md               # DD検索インデックステンプレート
+│   ├── hooks/                    # Claude Code フックテンプレート
+│   │   ├── pre-edit-guard.sh     #   重要ファイル編集ガード（settings.json/.env/DD-INDEX.md）
+│   │   └── post-bash-dd-archive-reminder.sh  #   アーカイブ時INDEX更新リマインダー
+│   └── scripts/
+│       └── dd-index-gen.sh       # DD-INDEX.md 全量再生成スクリプト
 ├── doc/
-│   ├── da-method.md             # DA方法論ガイド（品質フィルター・再チェック条件）
-│   ├── development-flow.md      # 5ステップフロー（Standard）
-│   ├── development-flow-full.md # 9ステップフロー（Full）
-│   ├── spec-sync-check.md       # 仕様書同期チェック
-│   ├── examples/                # 実例集（機能実装・設計判断・バグ修正）
-│   ├── customization/           # カスタマイズガイド
-│   └── UPGRADE-NOTICE.md       # 既存導入プロジェクト向けアップグレード手順
-├── CLAUDE.md                    # プロジェクト設定テンプレート
-├── IMPORT.md                    # 手動導入ガイド
-├── CHANGELOG.md                 # 変更履歴
-└── LICENSE                      # MIT License
+│   ├── da-method.md               # DA方法論ガイド（品質フィルター・再チェック条件）
+│   ├── development-flow.md        # 5ステップフロー（Standard）
+│   ├── development-flow-full.md   # 9ステップフロー（Full）
+│   ├── spec-sync-check.md         # 仕様書同期チェック
+│   ├── examples/                  # 実例集（機能実装・設計判断・バグ修正）
+│   ├── customization/             # カスタマイズガイド
+│   └── UPGRADE-NOTICE.md         # 既存導入プロジェクト向けアップグレード手順
+├── CLAUDE.md                      # プロジェクト設定テンプレート
+├── IMPORT.md                      # 手動導入ガイド
+├── CHANGELOG.md                   # 変更履歴
+└── LICENSE                        # MIT License
 ```
 
 ## カスタマイズ

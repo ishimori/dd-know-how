@@ -63,6 +63,7 @@ description: DD設計書セットアップコマンド
 ```
 {対象プロジェクト}/
 ├── {DDフォルダ}/              # 例: doc/DD/
+│   ├── DD-INDEX.md           # ← templates/DD-INDEX.md（検索インデックス）
 │   └── (空、またはサンプルDD)
 ├── {DDフォルダ}/../templates/
 │   ├── dd_template.md        # ← templates/dd_template.md
@@ -79,19 +80,73 @@ description: DD設計書セットアップコマンド
 ```
 {対象プロジェクト}/
 ├── .claude/
+│   ├── hooks/
+│   │   ├── post-bash-dd-archive-reminder.sh  # ← templates/hooks/（アーカイブ時INDEX更新リマインダー）
+│   │   └── pre-edit-guard.sh                 # ← templates/hooks/（重要ファイル編集ガード）
 │   └── skills/
 │       └── dd/
 │           └── SKILL.md      # ← skills/dd/SKILL.md
+├── scripts/
+│   └── dd-index-gen.sh       # ← templates/scripts/（INDEX全量再生成スクリプト）
 └── CLAUDE.md                 # ← CLAUDE.md.snippet の内容を追記
 ```
 
-### 5. CLAUDE.md の更新
+### 5. Hooks の設定（Level 2 のみ）
+
+以下の推奨設定をユーザーに表示する。**設定ファイルの編集はLLMが行ってはならない。人間が手動で設定すること。**
+
+Hooks はLLMの行動を制限するガードレールであり、LLM自身が設定・変更すべきではない。
+
+```
+📋 Hooks の設定が必要です。
+以下の JSON を .claude/settings.json（チーム共有）または
+.claude/settings.local.json（個人設定）の "hooks" キーに追加してください。
+
+既存の PreToolUse / PostToolUse 配列がある場合は末尾に追加してください。
+```
+
+推奨設定:
+
+```json
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/pre-edit-guard.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/post-bash-dd-archive-reminder.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+**⛔ LLMによる settings.json / settings.local.json の編集は禁止。** ユーザーが設定完了を報告するまで待つこと。
+
+### 6. CLAUDE.md の更新
 
 対象プロジェクトに CLAUDE.md が:
 - **存在する場合**: スニペットの内容を末尾に追記（重複チェック）
 - **存在しない場合**: 新規作成してスニペット内容を記載
 
-### 6. パス設定の調整
+### 7. パス設定の調整
 
 コピーしたファイル内のパス参照を、実際の配置先に合わせて更新:
 
@@ -99,7 +154,7 @@ description: DD設計書セットアップコマンド
 - `doc/templates/` → 実際のテンプレートフォルダパス
 - `doc/archived/DD/` → 実際のアーカイブフォルダパス
 
-### 7. パス整合性チェック（必須・スキップ禁止）
+### 8. パス整合性チェック（必須・スキップ禁止）
 
 セットアップ完了前に、以下のパス参照が実際のファイル配置と一致しているか検証する。**不一致がある場合はセットアップを完了せず、修正してから再検証する。**
 
@@ -109,6 +164,9 @@ description: DD設計書セットアップコマンド
 | 2 | SKILL.md の `templates/guides.md` 参照 | 記載パスに `guides.md` が存在するか |
 | 3 | SKILL.md の `doc/da-method.md` 参照 | 記載パスに `da-method.md` が存在するか |
 | 4 | テンプレートフォルダ | `coding-standards.md` が存在するか |
+| 5 | DDフォルダ | `DD-INDEX.md` が存在するか |
+| 6 | `.claude/hooks/` | `pre-edit-guard.sh` と `post-bash-dd-archive-reminder.sh` が存在するか（Level 2） |
+| 7 | `scripts/` | `dd-index-gen.sh` が存在するか（Level 2） |
 
 **検証手順:**
 1. 対象プロジェクトの CLAUDE.md からテンプレートパスを読み取る
@@ -122,11 +180,14 @@ description: DD設計書セットアップコマンド
   SKILL.md guides.md    → doc/templates/guides.md        ✓ 存在確認
   SKILL.md da-method.md → doc/da-method.md               ✓ 存在確認
   coding-standards.md   → doc/templates/coding-standards.md ✓ 存在確認
+  DD-INDEX.md           → doc/DD/DD-INDEX.md                ✓ 存在確認
+  pre-edit-guard.sh     → .claude/hooks/pre-edit-guard.sh   ✓ 存在確認 (Level 2)
+  dd-index-gen.sh       → scripts/dd-index-gen.sh           ✓ 存在確認 (Level 2)
 ```
 
 **全パスの存在が確認できるまで次のステップに進まないこと。**
 
-### 8. 完了報告
+### 9. 完了報告
 
 セットアップ完了後、以下を表示:
 
@@ -152,6 +213,8 @@ description: DD設計書セットアップコマンド
 | テンプレート | `doc/templates/` | `doc/templates/` |
 | アーカイブ | `doc/archived/DD/` | `doc/archived/DD/` |
 | スキル | `.claude/skills/` | （固定） |
+| フック | `.claude/hooks/` | （固定） |
+| スクリプト | `scripts/` | （任意） |
 
 ## 注意事項
 

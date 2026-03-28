@@ -8,6 +8,7 @@
 - **DDフォルダ**: `doc/DD/`
 - **アーカイブ**: `doc/archived/DD/`
 - **テンプレート**: `templates/dd_template.md`
+- **インデックス**: `doc/DD/DD-INDEX.md`
 
 ## 利用可能なスキル
 
@@ -19,6 +20,8 @@
 - `/dd list` - DD一覧
 - `/dd log メモ` - ログ追記
 - `/dd archive 番号` - アーカイブ
+- `/dd search キーワード` - DD検索
+- `/dd rebuild-index` - インデックス再構築
 - DA メソッド: `doc/da-method.md`（DA品質フィルター・再チェック条件）
 - `/setup パス` - 外部プロジェクトへDD導入
 
