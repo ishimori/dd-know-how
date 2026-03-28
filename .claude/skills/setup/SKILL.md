@@ -69,7 +69,8 @@ description: DD設計書セットアップコマンド
 │   ├── dd_template_tdd.md    # ← templates/dd_template_tdd.md（差分テンプレート）
 │   ├── dd_template_mock.md   # ← templates/dd_template_mock.md（差分テンプレート）
 │   ├── dd_template_e2e.md    # ← templates/dd_template_e2e.md（差分テンプレート）
-│   └── guides.md             # ← templates/guides.md（アプローチ選択ガイド）
+│   ├── guides.md             # ← templates/guides.md（アプローチ選択ガイド）
+│   └── coding-standards.md   # ← templates/coding-standards.md（コーディング基準書）
 └── {DDフォルダ}/../archived/DD/
     └── (空フォルダ)
 ```
@@ -107,6 +108,7 @@ description: DD設計書セットアップコマンド
 | 1 | CLAUDE.md の `テンプレート` 行 | 記載パスに `dd_template.md` が存在するか |
 | 2 | SKILL.md の `templates/guides.md` 参照 | 記載パスに `guides.md` が存在するか |
 | 3 | SKILL.md の `doc/da-method.md` 参照 | 記載パスに `da-method.md` が存在するか |
+| 4 | テンプレートフォルダ | `coding-standards.md` が存在するか |
 
 **検証手順:**
 1. 対象プロジェクトの CLAUDE.md からテンプレートパスを読み取る
@@ -119,6 +121,7 @@ description: DD設計書セットアップコマンド
   CLAUDE.md テンプレート → doc/templates/dd_template.md  ✓ 存在確認
   SKILL.md guides.md    → doc/templates/guides.md        ✓ 存在確認
   SKILL.md da-method.md → doc/da-method.md               ✓ 存在確認
+  coding-standards.md   → doc/templates/coding-standards.md ✓ 存在確認
 ```
 
 **全パスの存在が確認できるまで次のステップに進まないこと。**

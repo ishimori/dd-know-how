@@ -74,3 +74,76 @@ DD-050-3: FE/BE実装（動作確認→合意）
 ## 7. テスト戦略
 
 テストコードを書く前に、必ず自然言語でシナリオを作成しユーザーの合意を得ること。E2E駆動の場合はPlaywright MCPによるブラウザ自動操作で検証する。詳細は差分テンプレート（`dd_template_e2e.md` / `dd_template_tdd.md` / `dd_template_mock.md`）を参照。
+
+## 8. エビデンス収集
+
+**画面を伴う実装Phaseでは、Phase完了時にスクリーンショットエビデンスを取得する。**
+
+### 対象
+
+- 画面の新規作成・変更を含むPhase（アプローチ問わず）
+- バグ修正で画面表示が変わるもの
+
+### 手順（バグ修正の場合）
+
+1. **コード修正前**に画面を開き、問題箇所を赤枠ハイライト → キャプチャ（Before）
+2. コードを修正する
+3. **コード修正後**に同じ画面を開き、修正箇所を赤枠ハイライト → キャプチャ（After）
+4. `DD-{番号}/` フォルダに配置（番号部分のみ。例: `DD-061/`。タイトルは含めない）
+5. DD本体に Before/After テーブルを記載
+
+Before を撮り忘れると後から再現できない。**必ず修正前に撮ること。** バグ修正DDでは、実装Phaseの最初のタスクに「📸 Beforeキャプチャ取得」を入れること（guides.md を参照しなくてもタスクリストで気づけるようにする）。
+
+### 手順（新規開発の場合）
+
+1. 実装完了後、追加した箇所を赤枠ハイライト → キャプチャ
+2. `DD-{番号}/` フォルダに配置（番号部分のみ。例: `DD-061/`）
+3. DD本体にエビデンステーブルを記載
+
+### 赤枠ハイライト
+
+キャプチャ前に Playwright MCP の `browser_evaluate` でCSSを注入し、注目箇所を赤枠で囲む。人間がスクリーンショットを見た瞬間に「どこを見ればいいか」が分かるようにする。
+
+```javascript
+// 例: 単一要素
+document.querySelector('.target-element').style.cssText += 'outline: 3px solid red; outline-offset: 2px;';
+
+// 例: 複数要素を一括ハイライト
+document.querySelectorAll('.target-elements').forEach(el => {
+  el.style.cssText += 'outline: 3px solid red; outline-offset: 2px;';
+});
+```
+
+**いつ囲むか:**
+- **バグ修正**: 修正した箇所（Before: 問題箇所、After: 修正箇所）
+- **新規開発**: 今回追加した列・ボタン・セクションなど、レビューで確認してほしい箇所
+
+赤枠は「ここを見てください」というマーカー。囲む対象に迷ったら「人間がこのスクリーンショットだけ見てOK/NGを判断できるか？」を基準にする。
+
+### ファイル命名規則
+
+```
+{コンテキスト}-{before|after}-{説明}.png
+```
+
+例:
+- `bug61-before-incorrect-allowance.png`
+- `bug61-after-fixed-allowance.png`
+- `employee-list-after-column-added.png`
+
+### DD本体への記載形式
+
+```markdown
+## エビデンス
+
+| Before | After |
+|--------|-------|
+| ![before](DD-{番号}/xxx-before-yyy.png) | ![after](DD-{番号}/xxx-after-yyy.png) |
+| 説明（❌ 問題の状態） | 説明（✅ 修正後の状態） |
+```
+
+新規作成（Beforeなし）の場合は After のみの一覧でよい。
+
+### Playwright MCP が利用できない場合
+
+手動でスクリーンショットを取得し、同じフォルダ・命名規則で配置する。DDログに「手動キャプチャ」と明記すること。
