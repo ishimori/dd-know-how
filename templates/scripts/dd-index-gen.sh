@@ -37,15 +37,20 @@ if [ ! -d "$DD_DIR" ]; then
 fi
 
 # --- Collect DD files ---
+# NOTE: glob `DD-*.md` は DD-INDEX.md 自身もマッチするため明示的に除外する。
 DD_FILES=()
 for f in "$DD_DIR"/DD-*.md; do
-    [ -f "$f" ] && DD_FILES+=("$f")
+    [ -f "$f" ] || continue
+    [ "$(basename "$f")" = "DD-INDEX.md" ] && continue
+    DD_FILES+=("$f")
 done
 
 ARCHIVE_FILES=()
 if [ -d "$ARCHIVE_DIR" ]; then
     for f in "$ARCHIVE_DIR"/DD-*.md; do
-        [ -f "$f" ] && ARCHIVE_FILES+=("$f")
+        [ -f "$f" ] || continue
+        [ "$(basename "$f")" = "DD-INDEX.md" ] && continue
+        ARCHIVE_FILES+=("$f")
     done
 fi
 
@@ -211,7 +216,8 @@ fi
     echo ""
     echo "| DD | 件名 | ステータス |"
     echo "|----|------|-----------|"
-    grep '^active' "$ENTRIES_TMP" | sort -t$'\t' -k5,5nr | while IFS=$'\t' read -r _ dd_number title status _; do
+    # NOTE: grep が0件マッチで exit 1 を返すと pipefail+set -e で script 全体が落ちるため `|| true` で握りつぶす
+    { grep '^active' "$ENTRIES_TMP" || true; } | sort -t$'\t' -k5,5nr | while IFS=$'\t' read -r _ dd_number title status _; do
         printf '| %s | %s | %s |\n' "$dd_number" "$title" "$status"
     done
     echo ""
@@ -228,13 +234,14 @@ fi
     echo ""
     echo "| DD | 件名 | 主な成果 |"
     echo "|----|------|---------|"
-    grep '^archived' "$ENTRIES_TMP" | sort -t$'\t' -k5,5nr | while IFS=$'\t' read -r _ dd_number title _ _; do
+    { grep '^archived' "$ENTRIES_TMP" || true; } | sort -t$'\t' -k5,5nr | while IFS=$'\t' read -r _ dd_number title _ _; do
         printf '| %s | %s | |\n' "$dd_number" "$title"
     done
 } > "$INDEX_FILE"
 
 # --- Report ---
-active_count=$(grep -c '^active' "$ENTRIES_TMP" 2>/dev/null || echo 0)
-archived_count=$(grep -c '^archived' "$ENTRIES_TMP" 2>/dev/null || echo 0)
+# NOTE: grep -c は0件マッチ時に "0" を出力して exit 1 するため、`|| echo 0` だと "0\n0" が混入する。`|| true` で exit だけ握る。
+active_count=$(grep -c '^active' "$ENTRIES_TMP" 2>/dev/null || true)
+archived_count=$(grep -c '^archived' "$ENTRIES_TMP" 2>/dev/null || true)
 
 echo "DD-INDEX.md updated: $INDEX_FILE ($TOTAL 件: active=$active_count, archived=$archived_count)"

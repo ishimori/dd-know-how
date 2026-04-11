@@ -7,6 +7,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- バグ修正差分テンプレート（`dd_template_bugfix.md`）を新規追加
+  - フルパス/ライトパスの2パス分岐（規模に応じた適用）
+  - エビデンス手段の選択ガイド（画面キャプチャ/数値比較テーブル/テスト出力）
+  - 添付ドキュメントテンプレート（cause-analysis.md / bug-report.md / verification.md）
+- アプローチ選択を5つに拡張（バグ修正を優先順1位として追加）
 - `/workflow` スキルを新規追加（DDスキルから分離）
   - 9ステップ開発フロー・Phase管理・DA批判レビュー・仕様書同期
   - DDスキルのコンテキスト効率改善（428行→~120行）
@@ -31,6 +36,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - 見落としチェック → DA批判レビューに名称・概念を変更
   - テンプレート、実例、開発フロードキュメントを一括更新
 - setupスキルにworkflowスキル対応を追加（Level 2以上）
+
+### Fixed
+- `templates/scripts/dd-index-gen.sh` の3件のバグを修正
+  - グロブ `DD-*.md` が `DD-INDEX.md` 自身をマッチし「DD-INDEX」エントリが出力に混入する問題（ファイル収集時に basename で除外）
+  - アーカイブ0件時に grep パイプラインが `pipefail` + `set -e` で非ゼロ終了する問題（`|| true` ガード）
+  - レポート行 `archived=0` の表示に改行混入で `0\n0` になる問題（`|| echo 0` → `|| true`）
 
 ## [1.0.0] - 2025-01-24
 
