@@ -7,14 +7,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- 標準テンプレート（`dd_template.md`）に「実装前詳細化」2段階方式を導入
+  - Phase 0 に「📐 実装前詳細化トリガー判定」を追加（規模3シグナル + 複雑度6シグナル）
+  - 各実装Phase の冒頭に「📐 実装前詳細化」タスク（該当Phaseのみ）を追加し、人間レビューゲートを設置
+  - 計画段階での過剰設計を避けつつ、実装直前に必要な詳細化を強制する仕組み
+  - 差分テンプレート4種（bugfix/e2e/mock/tdd）は変更不要（標準のPhase 0を継承するため。bugfixは独自にフルパス/ライトパス分岐で同等の判定を持つ）
 - バグ修正差分テンプレート（`dd_template_bugfix.md`）を新規追加
   - フルパス/ライトパスの2パス分岐（規模に応じた適用）
   - エビデンス手段の選択ガイド（画面キャプチャ/数値比較テーブル/テスト出力）
   - 添付ドキュメントテンプレート（cause-analysis.md / bug-report.md / verification.md）
 - アプローチ選択を5つに拡張（バグ修正を優先順1位として追加）
-- `/workflow` スキルを新規追加（DDスキルから分離）
-  - 9ステップ開発フロー・Phase管理・DA批判レビュー・仕様書同期
-  - DDスキルのコンテキスト効率改善（428行→~120行）
 - DA批判レビュー（Devil's Advocate視点）を導入
   - 「確認したか？」→ **「どこが壊れるか？」** への概念転換
   - 4段階の批判手順（壊れる前提で探す→暗黙の前提を疑う→将来の破壊を予測→記録）
@@ -32,10 +34,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - 代替案・リスク・失敗シナリオ・保守性を検討
 
 ### Changed
-- DDスキルを2分割: `/dd`（操作のみ）+ `/workflow`（フロー管理）
 - 見落としチェック → DA批判レビューに名称・概念を変更
   - テンプレート、実例、開発フロードキュメントを一括更新
-- setupスキルにworkflowスキル対応を追加（Level 2以上）
 
 ### Fixed
 - `templates/scripts/dd-index-gen.sh` の3件のバグを修正

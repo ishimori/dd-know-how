@@ -180,8 +180,7 @@ dd-know-how/
 │       └── dd-index-gen.sh       # DD-INDEX.md 全量再生成スクリプト
 ├── doc/
 │   ├── da-method.md               # DA方法論ガイド（品質フィルター・再チェック条件）
-│   ├── development-flow.md        # 5ステップフロー（Standard）
-│   ├── development-flow-full.md   # 9ステップフロー（Full）
+│   ├── development-flow.md        # 5ステップフロー
 │   ├── spec-sync-check.md         # 仕様書同期チェック
 │   ├── examples/                  # 実例集（機能実装・設計判断・バグ修正）
 │   ├── customization/             # カスタマイズガイド
