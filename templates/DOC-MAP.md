@@ -1,0 +1,46 @@
+# DOC-MAP: ドキュメントインデックス
+
+> doc/ フォルダ内の全ドキュメントの場所と目的。
+> **ドキュメントの追加・移動時はここも更新すること。**
+
+## プロジェクト概要
+
+| ファイル | 説明 |
+|---------|------|
+| `doc/project-overview.md` | プロジェクトスコープ・環境・方針（未作成。最初に書くことを推奨） |
+
+## プロセス・開発規約
+
+| ファイル | 説明 |
+|---------|------|
+| `doc/da-method.md` | DD + Devil's Advocate 開発方法論（品質フィルター・再チェック条件） |
+| `doc/templates/coding-standards.md` | コーディング基準書（P規約・採点基準・Lint対応表） |
+| `doc/templates/lint/README.md` | Lintヒント基盤（LintエラーをLLMの自己修正ヒントにする） |
+
+## DD 設計文書
+
+| パス | 説明 |
+|------|------|
+| `doc/DD/` | アクティブな設計文書 |
+| `doc/DD/DD-INDEX.md` | DD一覧インデックス（`scripts/dd-index-gen.sh` で自動生成） |
+| `doc/archived/DD/` | 完了済みDD（アーカイブ） |
+
+## テンプレート
+
+| ファイル | 説明 |
+|---------|------|
+| `doc/templates/dd_template.md` | DD標準テンプレート（DA批判レビュー組み込み済み） |
+| `doc/templates/dd_template_bugfix.md` | バグ修正DD用 差分テンプレート |
+| `doc/templates/dd_template_mock.md` | モック先行DD用 差分テンプレート |
+| `doc/templates/dd_template_e2e.md` | E2E駆動DD用 差分テンプレート |
+| `doc/templates/dd_template_tdd.md` | TDD駆動DD用 差分テンプレート |
+| `doc/templates/guides.md` | DD作成ガイド（アプローチ選択・命名・サイズ管理・エビデンス） |
+
+<!--
+プロジェクトの成長に合わせてセクションを追加していく（参考: 成熟プロジェクトの構成例）:
+- ## アプリケーション理解 (guide/)    — 全体ガイド・画面カタログ・用語集
+- ## システム設計・仕様 (spec/)        — 機能仕様・状態遷移・権限モデル
+- ## デプロイ (deploy/)               — デプロイ手順・ロールバック
+- ## 運用 (operation/)                — サーバー構成・cron・監視
+- ## セキュリティ (security/)          — 監査レポート・インシデント対応
+-->

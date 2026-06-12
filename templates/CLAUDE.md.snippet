@@ -1,0 +1,35 @@
+# CLAUDE.md
+
+## プロジェクト概要
+
+{プロジェクトの説明を1〜2行で。詳細は doc/ に置き、ここには書かない}
+
+- **技術スタック**: {FE} / {BE} / {DB} / {インフラ}
+- **ドキュメント一覧**: `doc/DOC-MAP.md`（全ドキュメントの場所と目的。迷ったらまずここ）
+
+## コマンド
+
+| コマンド | 用途 |
+|---------|------|
+| {`npm run dev`} | 開発サーバー起動 |
+| {`npm run build`} | ビルド + 型チェック |
+| {`npm run lint`} | Lint（修正ヒント: `tools/lint-fix-hints.json`） |
+| {`npm test`} | テスト実行 |
+
+## DD設定
+
+- **DDフォルダ**: `doc/DD/` / **アーカイブ**: `doc/archived/DD/` / **テンプレート**: `doc/templates/dd_template.md`
+- **スキル**: `/dd new|list|log|archive|search|rebuild-index`
+- **開発フロー**: DD作成 → 仕様確認 → 実装 → 検証 → 完了（いきなりコードを書かない）
+- **DA メソッド**: `doc/da-method.md`
+
+## コーディング規約
+
+- 基準書: `doc/templates/coding-standards.md`（コードレビューはこの基準で評価する）
+- フロントエンド実装時は Modern Web Guidance で最新Webプラットフォーム知識を取得:
+  `npx modern-web-guidance@latest search "<課題>"` → `retrieve <ガイドID>`
+
+## ドキュメント更新義務
+
+- `doc/` にドキュメントを追加・移動したら `doc/DOC-MAP.md` も更新する
+- 画面・API・DBを変更したら、対応する仕様書も同じ変更で更新する

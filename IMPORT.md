@@ -59,6 +59,9 @@ mkdir -p doc/DD doc/templates doc/archived/DD
 
 # テンプレート一式（DDテンプレート・guides.md・coding-standards.md）をコピー
 cp dd-know-how/templates/*.md  doc/templates/
+
+# ドキュメントインデックスを配置（doc/ 直下。表内のパスは実配置に合わせて調整）
+cp dd-know-how/templates/DOC-MAP.md  doc/DOC-MAP.md
 ```
 
 これだけで DD 設計書を手動作成できます。テンプレートにはDA批判レビュー記録セクションが組み込み済みです。
@@ -73,9 +76,9 @@ mkdir -p .claude/skills/dd doc/
 cp dd-know-how/.claude/skills/dd/SKILL.md        .claude/skills/dd/
 cp dd-know-how/doc/da-method.md                  doc/
 
-# CLAUDE.md をコピーして編集
-cp dd-know-how/CLAUDE.md ./
-# → プロジェクト固有の設定（技術スタック、コーディング規約等）を追記
+# CLAUDE.md をスニペットから作成（50行程度に収める。詳細は doc/ に置きポインタで参照）
+cp dd-know-how/templates/CLAUDE.md.snippet ./CLAUDE.md
+# → {...} プレースホルダ（プロジェクト説明・技術スタック・コマンド）を埋める
 ```
 
 **導入後に使えるコマンド:**
@@ -94,6 +97,7 @@ your-project/
 │       │   └── SKILL.md           # DD操作（~120行、軽量）
 │       └── (プロジェクト固有のスキルを追加可能)
 ├── doc/
+│   ├── DOC-MAP.md                 # ドキュメントインデックス（追加・移動時に更新）
 │   ├── DD/                        # DD設計書（進行中）
 │   │   ├── DD-001_ログイン機能.md
 │   │   └── DD-002_API設計.md
@@ -135,12 +139,13 @@ DDテンプレートの記録テーブルにも品質フィルターのガイド
 
 ### Level 1
 - [ ] `doc/DD/` フォルダが存在する
+- [ ] `doc/DOC-MAP.md` が配置され、表内のパスが実配置と一致している
 - [ ] `doc/templates/dd_template.md` が配置されている
 - [ ] `doc/archived/DD/` フォルダが存在する
 
 ### Level 2（Level 1 に加えて）
 - [ ] `doc/da-method.md` が配置されている
-- [ ] CLAUDE.md にプロジェクト固有の設定が記載されている
+- [ ] CLAUDE.md が50行程度で、プロジェクト固有の設定（技術スタック・コマンド）が埋まっている
 
 ### パス整合性チェック（Level 2 必須）
 
@@ -158,6 +163,15 @@ CLAUDE.md と SKILL.md 内のパス参照が、実際のファイル配置と一
   SKILL.md guides.md    → doc/templates/guides.md        ✓ 存在確認
   SKILL.md da-method.md → doc/da-method.md               ✓ 存在確認
 ```
+
+## オプション導入
+
+セットアップ後、プロジェクトの性質に応じて以下を追加できる:
+
+| オプション | 内容 | テンプレート |
+|-----------|------|-------------|
+| **Playwright MCP** | Claudeに「目」を与える。エビデンス取得（guides.md）の前提。`.mcp.json` をプロジェクト直下に配置し、Claude Code 再起動で有効 | `templates/mcp/mcp.json` |
+| **Lintヒント基盤** | LintエラーをP規約ID + 修正方針付きでLLMに返し、自己修正ループを作る。PostToolUse hook で編集直後のフィードバックも可能 | `templates/lint/`（手順: `templates/lint/README.md`） |
 
 ## 既存導入のアップグレード
 
