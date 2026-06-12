@@ -1,0 +1,21 @@
+# =====================================================================
+# coding-standards.md 機械的強制ルール（ruff 用スニペット、Python/FastAPI）
+#
+# pyproject.toml の [tool.ruff.lint] または ruff.toml にマージして使う。
+# ruff のエラーメッセージは変更できないため、ルールID → P規約 → 修正方針の
+# 対応は lint-fix-hints.json を参照する。
+# =====================================================================
+
+[lint]
+extend-select = [
+  "PGH003", # P19: 範囲指定なしの # type: ignore の禁止
+  "ANN401", # P19: 引数型 Any の禁止
+  "FIX",    # P20: TODO/FIXME の残置禁止
+  "T201",   # P21: print() の残置禁止
+  "S608",   # P22: SQLインジェクション（f-string/連結によるSQL構築）防止
+]
+
+[lint.per-file-ignores]
+# スクリプト・テストは print / SQL直書きを許容（coding-standards.md 例外一覧に準拠）
+"scripts/**" = ["T201", "FIX"]
+"tests/**" = ["T201", "S608"]
