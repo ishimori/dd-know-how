@@ -4,6 +4,7 @@
 |-----------|--------|------|
 | 1.0 | 2026-03-01 | 初版 |
 | 1.1 | 2026-03-28 | P02再定義、P04/P06緩和、P20明確化、C1/C2分離、例外一覧追加 |
+| 1.2 | 2026-06-12 | 補完ツール（Modern Web Guidance）セクション追加 |
 
 ---
 
@@ -536,6 +537,38 @@ FastAPI 公式ドキュメント [Dependencies](https://fastapi.tiangolo.com/tut
 | P20 | `abc.ABC` の抽象メソッドでの `raise NotImplementedError` は許可。ガード節としての早期リターンはスタブとみなさない |
 | P21 | `console.error` / `console.warn` を構造化ログとして意図的に使用する場合は許可 |
 | P05, P07, P09, P12, P13, P14, P16, P22 | 例外なし |
+
+---
+
+## 補完ツール: Modern Web Guidance
+
+本書はコードレビュー用の判定規約（型安全・設計・LLMアンチパターン）を定めるものであり、モダンWebプラットフォーム（最新のCSS・HTML・ブラウザAPI・パフォーマンス・アクセシビリティ・パスキー等）の実装知識はカバーしない。その領域は Google Chrome チーム公式の **Modern Web Guidance**（AIコーディングエージェント向けの専門家検証済みガイド集。102のWeb機能・128ユースケース、ブラウザ互換性データ付き）で補完する。
+
+**役割分担**: 本書 = レビュー時の合否判定 / Modern Web Guidance = 実装時の知識注入（検索→取得）
+
+### 使い方（CLI直接利用 — プラグイン不要）
+
+フロントエンド実装Phaseで、対象機能の実装前に検索して該当ガイドをコンテキストに取り込む:
+
+```bash
+# ユースケースを検索（ローカルのセマンティック検索。ネットワーク・APIキー不要）
+npx modern-web-guidance@latest search "実装したいことを英語で記述"
+
+# ヒットしたIDでガイド本文（Markdown）を取得
+npx modern-web-guidance@latest retrieve <ガイドID>
+```
+
+### Claude Code プラグインとして導入する場合
+
+プラグインが利用できる環境では、以下で検索・取得が自動化される:
+
+```
+/plugin marketplace add GoogleChrome/modern-web-guidance
+/plugin install modern-web-guidance@googlechrome
+/reload-plugins
+```
+
+> **注意**: 2026年6月時点でプレビュー段階（コンテンツ拡充中）。詳細: https://developer.chrome.com/docs/modern-web-guidance
 
 ---
 
