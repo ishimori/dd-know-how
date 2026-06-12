@@ -20,7 +20,7 @@
 ## 仕様書（現在形の正典）
 
 > DD = 変更の記録（フロー）、spec = 現在の姿（ストック）。
-> DDアーカイブ時に同期チェックを行う（`doc/spec-sync-check.md`）。
+> DDアーカイブ時に同期チェックを行う（手順: spec-sync-check.md、Level 2 で doc/ 直下に配置）。
 
 | パス | 説明 |
 |------|------|
@@ -44,6 +44,7 @@
 | `doc/templates/dd_template_e2e.md` | E2E駆動DD用 差分テンプレート |
 | `doc/templates/dd_template_tdd.md` | TDD駆動DD用 差分テンプレート |
 | `doc/templates/guides.md` | DD作成ガイド（アプローチ選択・命名・サイズ管理・エビデンス） |
+| `doc/templates/screen-spec-template.md` | 画面仕様書テンプレート（フロントマター status_check 付き） |
 
 <!--
 プロジェクトの成長に合わせてセクションを追加していく（参考: 成熟プロジェクトの構成例）:

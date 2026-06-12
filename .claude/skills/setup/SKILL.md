@@ -95,7 +95,8 @@ description: DD設計書セットアップコマンド
 │   ├── da-method.md          # ← doc/da-method.md（DA品質フィルター・再チェック条件）
 │   └── spec-sync-check.md    # ← doc/spec-sync-check.md（アーカイブ時の仕様書同期チェック手順）
 ├── scripts/
-│   └── dd-index-gen.sh       # ← templates/scripts/（INDEX全量再生成スクリプト）
+│   ├── dd-index-gen.sh       # ← templates/scripts/（INDEX全量再生成スクリプト）
+│   └── doc-check.sh          # ← templates/scripts/（DOC-MAP整合性チェック: 孤児・リンク切れ検出）
 └── CLAUDE.md                 # ← templates/CLAUDE.md.snippet をベースに作成（ステップ6）
 ```
 

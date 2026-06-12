@@ -1,10 +1,11 @@
-# DD インデックス生成スクリプト
+# 運用スクリプト
 
-このディレクトリには DD-INDEX.md を自動生成するスクリプトが置かれている。
+このディレクトリにはドキュメント運用を機械検証するスクリプトが置かれている。
 
 ## ファイル
 
-- `dd-index-gen.sh` — Bash 版（デフォルト・技術スタック非依存）
+- `dd-index-gen.sh` — DD-INDEX.md の全量再生成（Bash 版・技術スタック非依存）
+- `doc-check.sh` — DOC-MAP.md と doc/ 配下の整合性チェック（孤児ドキュメント・リンク切れ検出）
 
 ## 使い方
 
@@ -12,9 +13,13 @@
 bash scripts/dd-index-gen.sh
 # または明示的にパス指定:
 bash scripts/dd-index-gen.sh --dd-dir doc/DD --archive-dir doc/archived/DD
+
+bash scripts/doc-check.sh            # 終了コード 0=整合 / 1=ERRORあり
+bash scripts/doc-check.sh --doc-dir doc
 ```
 
-`/dd rebuild-index` からも呼び出される。
+`dd-index-gen.sh` は `/dd rebuild-index` からも呼び出される。
+`doc-check.sh` は precheck（lint・テストと並ぶDD完了前の集約チェック）への組み込みを推奨。
 
 ---
 
