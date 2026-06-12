@@ -16,13 +16,14 @@
 | {`npm run lint`} | Lint（修正ヒント: `tools/lint-fix-hints.json`） |
 | {`npm test`} | テスト実行 |
 | `bash scripts/doc-check.sh` | ドキュメント整合性チェック（DOC-MAP孤児・リンク切れ） |
+| {`npm run precheck`} | DD完了前の集約チェック（lint + テスト + doc-check） |
 
 ## DD設定
 
 - **DDフォルダ**: `doc/DD/` / **アーカイブ**: `doc/archived/DD/` / **テンプレート**: `doc/templates/dd_template.md`
 - **スキル**: `/dd new|list|log|archive|search|rebuild-index`
 - **開発フロー**: DD作成 → 仕様確認 → 実装 → 検証 → 完了（いきなりコードを書かない）
-- **DA メソッド**: `doc/da-method.md`
+- **DA メソッド**: `doc/da-method.md` / **コミット**: `DD-{番号}: 概要` 形式
 
 ## コーディング規約
 
