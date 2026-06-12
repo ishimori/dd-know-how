@@ -62,6 +62,9 @@ cp dd-know-how/templates/*.md  doc/templates/
 
 # ドキュメントインデックスを配置（doc/ 直下。表内のパスは実配置に合わせて調整）
 cp dd-know-how/templates/DOC-MAP.md  doc/DOC-MAP.md
+
+# 知見蓄積ファイルは doc/ 直下に移動（テンプレートではなく実体として使う）
+mv doc/templates/engineering-patterns.md doc/templates/decisions.md doc/
 ```
 
 これだけで DD 設計書を手動作成できます。テンプレートにはDA批判レビュー記録セクションが組み込み済みです。
@@ -144,6 +147,7 @@ DDテンプレートの記録テーブルにも品質フィルターのガイド
 - [ ] `doc/DOC-MAP.md` が配置され、表内のパスが実配置と一致している
 - [ ] `doc/spec/` フォルダが存在する
 - [ ] `doc/templates/dd_template.md` が配置されている
+- [ ] `doc/engineering-patterns.md` と `doc/decisions.md` が doc/ 直下に配置されている
 - [ ] `doc/archived/DD/` フォルダが存在する
 
 ### Level 2（Level 1 に加えて）

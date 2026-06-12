@@ -67,6 +67,8 @@ description: DD設計書セットアップコマンド
 │   └── (空、またはサンプルDD)
 ├── {DDフォルダ}/../DOC-MAP.md  # ← templates/DOC-MAP.md（ドキュメントインデックス。実パスに合わせて表内を調整）
 ├── {DDフォルダ}/../spec/       # 仕様書フォルダ（現在形の正典。最初は空でよい）
+├── {DDフォルダ}/../engineering-patterns.md  # ← templates/engineering-patterns.md（gotcha・定石の横断集）
+├── {DDフォルダ}/../decisions.md             # ← templates/decisions.md（長寿命の意思決定記録）
 ├── {DDフォルダ}/../templates/
 │   ├── dd_template.md        # ← templates/dd_template.md
 │   ├── dd_template_bugfix.md # ← templates/dd_template_bugfix.md（差分テンプレート）
