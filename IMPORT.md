@@ -25,7 +25,7 @@
 | コンポーネント | Level 1 | Level 2 |
 |---------------|---------|---------|
 | DDテンプレート（DA批判レビュー組み込み済み） | ✅ | ✅ |
-| DD基本ルール | ✅ | ✅ |
+| DD作成ガイド（guides.md・基本ルール） | ✅ | ✅ |
 | DDフォルダ構造 | ✅ | ✅ |
 | `/dd` スキル（作成・参照・一覧・検索・アーカイブ） | - | ✅ |
 | DA メソッド文書（DA品質フィルター・再チェック条件） | - | ✅ |
@@ -57,9 +57,8 @@ cd your-project
 # フォルダ作成
 mkdir -p doc/DD doc/templates doc/archived/DD
 
-# テンプレート一式と基本ルールをコピー
+# テンプレート一式（DDテンプレート・guides.md・coding-standards.md）をコピー
 cp dd-know-how/templates/*.md  doc/templates/
-cp dd-know-how/rules/dd-basic-rules.md   doc/templates/
 ```
 
 これだけで DD 設計書を手動作成できます。テンプレートにはDA批判レビュー記録セクションが組み込み済みです。
@@ -100,7 +99,9 @@ your-project/
 │   │   └── DD-002_API設計.md
 │   ├── templates/
 │   │   ├── dd_template.md         # DDテンプレート（DA批判レビュー組み込み済み）
-│   │   └── dd-basic-rules.md      # DD基本ルール
+│   │   ├── dd_template_*.md       # 差分テンプレート（bugfix / tdd / mock / e2e）
+│   │   ├── guides.md              # DD作成ガイド（アプローチ選択・基本ルール）
+│   │   └── coding-standards.md    # コーディング基準書
 │   └── archived/
 │       └── DD/                    # アーカイブ済みDD
 └── CLAUDE.md                      # プロジェクト設定
@@ -124,7 +125,7 @@ DDテンプレートの記録テーブルにも品質フィルターのガイド
 | 項目 | 推奨パス | 備考 |
 |------|----------|------|
 | DDフォルダ | `doc/DD/` | 進行中のDD設計書を配置 |
-| テンプレート | `doc/templates/` | DDテンプレート・基本ルール |
+| テンプレート | `doc/templates/` | DDテンプレート・作成ガイド・コーディング基準書 |
 | アーカイブ | `doc/archived/DD/` | 完了済みDDの保管先 |
 | スキル | `.claude/skills/` | Claude Code skills形式（固定） |
 
