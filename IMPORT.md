@@ -55,7 +55,7 @@ claude
 cd your-project
 
 # フォルダ作成
-mkdir -p doc/DD doc/templates doc/archived/DD
+mkdir -p doc/DD doc/spec doc/templates doc/archived/DD
 
 # テンプレート一式（DDテンプレート・guides.md・coding-standards.md）をコピー
 cp dd-know-how/templates/*.md  doc/templates/
@@ -75,6 +75,7 @@ Level 1 のファイルに加えて:
 mkdir -p .claude/skills/dd doc/
 cp dd-know-how/.claude/skills/dd/SKILL.md        .claude/skills/dd/
 cp dd-know-how/doc/da-method.md                  doc/
+cp dd-know-how/doc/spec-sync-check.md            doc/
 
 # CLAUDE.md をスニペットから作成（50行程度に収める。詳細は doc/ に置きポインタで参照）
 cp dd-know-how/templates/CLAUDE.md.snippet ./CLAUDE.md
@@ -101,6 +102,7 @@ your-project/
 │   ├── DD/                        # DD設計書（進行中）
 │   │   ├── DD-001_ログイン機能.md
 │   │   └── DD-002_API設計.md
+│   ├── spec/                      # 仕様書（現在形の正典。DDアーカイブ時に同期チェック）
 │   ├── templates/
 │   │   ├── dd_template.md         # DDテンプレート（DA批判レビュー組み込み済み）
 │   │   ├── dd_template_*.md       # 差分テンプレート（bugfix / tdd / mock / e2e）
@@ -140,11 +142,13 @@ DDテンプレートの記録テーブルにも品質フィルターのガイド
 ### Level 1
 - [ ] `doc/DD/` フォルダが存在する
 - [ ] `doc/DOC-MAP.md` が配置され、表内のパスが実配置と一致している
+- [ ] `doc/spec/` フォルダが存在する
 - [ ] `doc/templates/dd_template.md` が配置されている
 - [ ] `doc/archived/DD/` フォルダが存在する
 
 ### Level 2（Level 1 に加えて）
 - [ ] `doc/da-method.md` が配置されている
+- [ ] `doc/spec-sync-check.md` が配置されている（アーカイブ時の同期チェック手順）
 - [ ] CLAUDE.md が50行程度で、プロジェクト固有の設定（技術スタック・コマンド）が埋まっている
 
 ### パス整合性チェック（Level 2 必須）

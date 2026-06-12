@@ -17,6 +17,15 @@
 | `doc/templates/coding-standards.md` | コーディング基準書（P規約・採点基準・Lint対応表） |
 | `doc/templates/lint/README.md` | Lintヒント基盤（LintエラーをLLMの自己修正ヒントにする） |
 
+## 仕様書（現在形の正典）
+
+> DD = 変更の記録（フロー）、spec = 現在の姿（ストック）。
+> DDアーカイブ時に同期チェックを行う（`doc/spec-sync-check.md`）。
+
+| パス | 説明 |
+|------|------|
+| `doc/spec/` | 画面・機能仕様書（テンプレート: `doc/templates/screen-spec-template.md`） |
+
 ## DD 設計文書
 
 | パス | 説明 |

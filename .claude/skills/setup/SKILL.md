@@ -66,6 +66,7 @@ description: DD設計書セットアップコマンド
 │   ├── DD-INDEX.md           # ← templates/DD-INDEX.md（検索インデックス）
 │   └── (空、またはサンプルDD)
 ├── {DDフォルダ}/../DOC-MAP.md  # ← templates/DOC-MAP.md（ドキュメントインデックス。実パスに合わせて表内を調整）
+├── {DDフォルダ}/../spec/       # 仕様書フォルダ（現在形の正典。最初は空でよい）
 ├── {DDフォルダ}/../templates/
 │   ├── dd_template.md        # ← templates/dd_template.md
 │   ├── dd_template_bugfix.md # ← templates/dd_template_bugfix.md（差分テンプレート）
@@ -73,6 +74,7 @@ description: DD設計書セットアップコマンド
 │   ├── dd_template_mock.md   # ← templates/dd_template_mock.md（差分テンプレート）
 │   ├── dd_template_e2e.md    # ← templates/dd_template_e2e.md（差分テンプレート）
 │   ├── guides.md             # ← templates/guides.md（アプローチ選択ガイド）
+│   ├── screen-spec-template.md # ← templates/screen-spec-template.md（画面仕様書テンプレート）
 │   └── coding-standards.md   # ← templates/coding-standards.md（コーディング基準書）
 └── {DDフォルダ}/../archived/DD/
     └── (空フォルダ)
@@ -89,6 +91,9 @@ description: DD設計書セットアップコマンド
 │   └── skills/
 │       └── dd/
 │           └── SKILL.md      # ← skills/dd/SKILL.md
+├── doc/
+│   ├── da-method.md          # ← doc/da-method.md（DA品質フィルター・再チェック条件）
+│   └── spec-sync-check.md    # ← doc/spec-sync-check.md（アーカイブ時の仕様書同期チェック手順）
 ├── scripts/
 │   └── dd-index-gen.sh       # ← templates/scripts/（INDEX全量再生成スクリプト）
 └── CLAUDE.md                 # ← templates/CLAUDE.md.snippet をベースに作成（ステップ6）
