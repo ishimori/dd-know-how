@@ -5,6 +5,7 @@
 ## ファイル
 
 - `dd-index-gen.sh` — DD-INDEX.md の全量再生成（Bash 版・技術スタック非依存）
+- `dd-health.sh` — DD運用ヘルスチェック（クローズ漏れ・滞留・ログ形骸化・DA雛形残置・表記ゆれの静的分析。`--dd DD-NNN` で単一DDの即時チェック）
 - `doc-check.sh` — DOC-MAP.md と doc/ 配下の整合性チェック（孤児ドキュメント・リンク切れ検出）
 - `codex-review.sh` — Codexレビュー自動実行（**任意**。サブスク認証のCodex CLI導入時のみ。別モデル視点で実装差分をレビューさせAPI課金なし。`--check` で利用可否判定・トークン消費なし）
 
@@ -17,6 +18,11 @@ bash scripts/dd-index-gen.sh --dd-dir doc/DD --archive-dir doc/archived/DD
 
 bash scripts/doc-check.sh            # 終了コード 0=整合 / 1=ERRORあり
 bash scripts/doc-check.sh --doc-dir doc
+
+bash scripts/dd-health.sh                     # 全体レポート（Markdown を stdout に出力）
+bash scripts/dd-health.sh --dd DD-042 --new   # 作成直後のセルフチェック（DA雛形は正常扱い）
+bash scripts/dd-health.sh --dd DD-042         # アーカイブ前チェック（ログ・DA記入も見る）
+bash scripts/dd-health.sh --strict            # ⚠️があれば終了コード1（precheck組み込み用）
 ```
 
 `dd-index-gen.sh` は `/dd rebuild-index` からも呼び出される。
