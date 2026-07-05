@@ -38,6 +38,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - テンプレート、実例、開発フロードキュメントを一括更新
 
 ### Fixed
+- `templates/scripts/dd-health.sh` の Windows gawk 正規表現バグ2件を修正（適用先プロジェクトの実DDで全Phase✅を実機確認）
+  - 🔬絵文字（非BMP文字）は Windows の gawk の正規表現で照合できず、「🔬機械検証タスクがないPhase」が全DD・全Phaseで偽陽性になる問題（タスク文言「機械検証/机上突合/机上検証」での判定に変更）
+  - 多バイト文字を含む正規表現では `.*` が絵文字を跨げず、Phaseタイトル切り出し `sub(/[:：].*/)` が「Phase 1: 設計（📐 x）」→「Phase 1� x）」のような切り残しになる問題（正規表現でなく index/substr で切る方式に変更）
 - `templates/scripts/dd-index-gen.sh` の3件のバグを修正
   - グロブ `DD-*.md` が `DD-INDEX.md` 自身をマッチし「DD-INDEX」エントリが出力に混入する問題（ファイル収集時に basename で除外）
   - アーカイブ0件時に grep パイプラインが `pipefail` + `set -e` で非ゼロ終了する問題（`|| true` ガード）

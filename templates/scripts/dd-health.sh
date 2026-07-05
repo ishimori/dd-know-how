@@ -123,11 +123,20 @@ FNR <= 8 && created == "" && /^\|[ \t]*[0-9]{4}-[0-9]{2}-[0-9]{2}/ {
     if (section ~ /ログ/) log_days++
     else if (section ~ /タスク一覧/ && $0 ~ /Phase/) {
         close_phase(); phases++
-        cur_phase = trim(substr($0, 5)); sub(/[:：].*/, "", cur_phase); cur_phase = trim(cur_phase)
+        # タイトルは最初のコロン（半角/全角）までで切る。sub(/[:：].*/) だと Windows の
+        # gawk で .* が絵文字（非BMP文字）を跨げず切り残しが出るため、正規表現でなく
+        # index/substr で切る（実測: 「Phase 1: 設計（📐 x）」→「Phase 1� x）」に化けた）
+        cur_phase = trim(substr($0, 5))
+        p = index(cur_phase, ":"); q = index(cur_phase, "：")
+        if (q && (!p || q < p)) p = q
+        if (p) cur_phase = substr(cur_phase, 1, p - 1)
+        cur_phase = trim(cur_phase)
         cur_has = ($0 ~ /Phase[ \t]*0/) ? 1 : 0   # Phase 0 は🔬対象外
     }
 }
-section ~ /タスク一覧/ && /🔬/ { cur_has = 1 }
+# 🔬絵文字（非BMP）は Windows の gawk の正規表現で照合できない（出力への印字は正常・
+# BMP文字の照合は正常、と実測）ため、タスク文言（機械検証/机上突合/机上検証）で判定する
+section ~ /タスク一覧/ && /機械検証|机上突合|机上検証/ { cur_has = 1 }
 /\{番号\}|\{タイトル\}|\{日付\}/ { ph++ }
 /<!--/ { hc++ }
 section ~ /DA/ && /^\|[ \t]*[0-9]+[ \t]*\|/ {
