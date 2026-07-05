@@ -34,6 +34,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - 代替案・リスク・失敗シナリオ・保守性を検討
 
 ### Changed
+- `templates/scripts/dd-index-gen.sh`: 完了済みセクションの「主な成果」列にステータス欄を表示するよう変更（従来は `read` で status を捨て `printf` で空をハードコードしていたため常に空欄だった。完了時ステータスに成果要約を書く運用と組み合わせる）
 - 見落としチェック → DA批判レビューに名称・概念を変更
   - テンプレート、実例、開発フロードキュメントを一括更新
 

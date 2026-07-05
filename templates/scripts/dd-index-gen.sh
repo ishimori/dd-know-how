@@ -234,8 +234,11 @@ fi
     echo ""
     echo "| DD | 件名 | 主な成果 |"
     echo "|----|------|---------|"
-    { grep '^archived' "$ENTRIES_TMP" || true; } | sort -t$'\t' -k5,5nr | while IFS=$'\t' read -r _ dd_number title _ _; do
-        printf '| %s | %s | |\n' "$dd_number" "$title"
+    # 「主な成果」列にはステータス欄を流用する（完了時ステータスに成果要約を書く運用。
+    # 空欄だと完了DDの索引価値が低いため）。専用の成果フィールドは設けない（DDテンプレ
+    # 変更と既存DDへの遡及・本文スキャンが要り、費用対効果が低いため見送り）。
+    { grep '^archived' "$ENTRIES_TMP" || true; } | sort -t$'\t' -k5,5nr | while IFS=$'\t' read -r _ dd_number title status _; do
+        printf '| %s | %s | %s |\n' "$dd_number" "$title" "$status"
     done
 } > "$INDEX_FILE"
 
