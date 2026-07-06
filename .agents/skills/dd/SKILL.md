@@ -45,6 +45,7 @@ ls {DDフォルダ}/ | grep DD-{番号}
 - 「DD-080の添付ファイルを作って」「関連資料を追加」 → 添付ファイル作成
 - 「DDを検索」「〇〇に関連するDD」「〇〇って以前やった？」 → 検索
 - 「インデックス再構築」「DD-INDEXを更新」 → インデックス再構築
+- 「DDスキルを更新して」「dd-know-how から最新を取り込んで」 → 更新（dd-update）
 
 ## DD番号の解釈（柔軟に）
 
@@ -99,6 +100,14 @@ ls {DDフォルダ}/ | grep DD-{番号}
 ### インデックス再構築
 
 `bash scripts/dd-index-gen.sh` を実行して DD-INDEX.md を全量再生成する。スクリプトが存在しない場合はユーザーに `templates/scripts/dd-index-gen.sh` のコピーを提案する。
+
+### 更新（dd-know-how からの取り込み）
+
+DDスキル・スクリプト・テンプレート一式を dd-know-how の最新に更新する。
+
+1. `bash scripts/dd-update.sh --dry-run` で更新予定を確認し、問題なければ `bash scripts/dd-update.sh` で取り込む
+2. 出力と git diff を要約してユーザーに提示する。**コミットはユーザーの確認後**（スクリプトはコミットしない。ブランチ警告が出ていたら特に確認）
+3. スクリプトが存在しない場合は、dd-know-how の `doc/UPGRADE-NOTICE.md` 最新版の手順による初回導入を提案する
 
 ### ログ追記
 

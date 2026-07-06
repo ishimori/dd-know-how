@@ -25,3 +25,11 @@ ARCHIVE_DIR="doc/archived/DD"
 
 # doc-check.sh が走査するドキュメントルート（DOC-MAP.md のある場所）
 DOC_DIR="doc"
+
+# （任意）dd-update.sh が参照する dd-know-how の場所。
+# 省略時はプロジェクトの兄弟ディレクトリ ../dd-know-how を使う
+# SOURCE_REPO="C:/repo/dd-know-how"
+
+# （任意）テンプレートフォルダ。省略時は doc/templates → docs/templates →
+# templates の順に dd_template.md の実在で自動検出する
+# TEMPLATES_DIR="doc/templates"

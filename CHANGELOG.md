@@ -7,6 +7,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- **Pull型更新（`dd-update.sh`）**: 各プロジェクト側から `bash scripts/dd-update.sh` 一発で dd-know-how の最新配布物（scripts / hooks / スキル / テンプレート / 方法論文書）を取り込む
+  - 呼び出し口スタブだけを各プロジェクトに配布し、本体（`tools/dd-update-core.sh`）は dd-know-how 側に常駐 — スタブが exec するため更新ロジック自体の配り直しが不要
+  - dd-know-how の場所は既定で兄弟ディレクトリ `../dd-know-how`（`.dd-config` の `SOURCE_REPO` で変更可）。テンプレートフォルダは実在検出（`TEMPLATES_DIR` で明示も可）
+  - `.dd-config`・CLAUDE.md・DOC-MAP.md・DD-INDEX.md・engineering-patterns.md・decisions.md 等のプロジェクト固有ファイルは不可侵（`.dd-config` は無い場合の自動生成のみ）
+  - 対象が main 以外のブランチ/未コミット変更ありの場合は警告。差分のあるファイルだけコピーし件数報告。**コミットは行わない**（diff確認と判断は人間/LLM側）
+  - `/dd update`（「DDスキルを更新して」）としてスキルにも配線
 - **ステータス固定語彙 + 補足列**（ヘッダ表4列化: 作成日/更新日/ステータス/補足）
   - ステータスは固定6種のみ: 検討中/進行中/確認待ち/保留/見送り/完了（語彙ルール: `templates/guides.md` §3 新設）
   - 補足列に説明・成果を分離（完了時の成果要約は DD-INDEX「主な成果」へ転載）。外部ビューアのKANBAN分類・INDEX自動分類・ヘルスチェックの機械判定を安定させる
