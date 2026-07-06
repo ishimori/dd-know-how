@@ -7,6 +7,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- **ステータス固定語彙 + 補足列**（ヘッダ表4列化: 作成日/更新日/ステータス/補足）
+  - ステータスは固定6種のみ: 検討中/進行中/確認待ち/保留/見送り/完了（語彙ルール: `templates/guides.md` §3 新設）
+  - 補足列に説明・成果を分離（完了時の成果要約は DD-INDEX「主な成果」へ転載）。外部ビューアのKANBAN分類・INDEX自動分類・ヘルスチェックの機械判定を安定させる
+  - `dd_template.md` を4列化（初期値「検討中」）。dd/setup SKILL に語彙運用を組み込み（アーカイブ時チェックリストに「ステータス=完了/見送り・補足に成果1行」を追加）
+  - `dd-health.sh` にステータス語彙lint（固定6種以外を⚠️検出。`/dd new` のセルフチェックで作成時に自動矯正）
+- **`.dd-config` パス設定基盤**（導入先での「パスが違う」再発防止）
+  - パス設定（DD_DIR / ARCHIVE_DIR / DOC_DIR）をルート直下 `.dd-config` に一元化（`templates/dd-config.example` 新設）
+  - 全スクリプト（dd-index-gen / dd-health / doc-check / codex-review）とアーカイブリマインダーフックが、自己位置からプロジェクトルートを解決して `.dd-config` を読む方式に（**CWD非依存** + スクリプト上書き更新で設定が消えない）
+  - エラーメッセージを自己修復型に（`.dd-config` の作成例を提示）。`.dd-config` なしでは `docs/DD` 配置も自動検出
+- `templates/AGENTS.md.snippet` を新設（.agents 版 setup が参照していたが実体が無かった）
+- `doc/UPGRADE-NOTICE.md` に v4 エントリ（導入済みプロジェクト向け取り込み手順書 + 配布物マップ〔上書き可否〕）
 - 標準テンプレート（`dd_template.md`）に「実装前詳細化」2段階方式を導入
   - Phase 0 に「📐 実装前詳細化トリガー判定」を追加（規模3シグナル + 複雑度6シグナル）
   - 各実装Phase の冒頭に「📐 実装前詳細化」タスク（該当Phaseのみ）を追加し、人間レビューゲートを設置
@@ -34,11 +45,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - 代替案・リスク・失敗シナリオ・保守性を検討
 
 ### Changed
+- `templates/scripts/dd-index-gen.sh`: 「保留・見送り」セクションを自動生成（ステータス 保留/見送り を検出。従来は「自動検出不可」として常に空）。進行中セクションに補足列を追加。「主な成果」は補足列を優先し、無ければステータス欄（旧運用互換）。TS参考実装（`templates/scripts/README.md`）も同仕様に全面更新
+- `templates/scripts/dd-health.sh`: 「見送り」のままアクティブなDDもクローズ漏れ扱いに。ステータス語彙テーブルをアクティブDD限定 + 固定6種判定列付きに変更
+- `/setup` スキル: パス調整ステップを `.dd-config` 生成方式に変更（**scripts/・hooks/ 内のパス直書きを禁止**）。パス整合性チェックに `.dd-config` 検証と `dd-index-gen.sh` 実行テストを追加
+- `templates/guides.md`: §3「ステータスと補足列（固定語彙）」を挿入し旧§3以降を+1リナンバー（tdd/e2e テンプレの「§7」参照を「§8」へ追随）。フォルダ構成例をスクリプト既定値（`doc/archived/DD`）と一致させ、実配置は `.dd-config` が正であることを明記
 - `templates/scripts/dd-index-gen.sh`: 完了済みセクションの「主な成果」列にステータス欄を表示するよう変更（従来は `read` で status を捨て `printf` で空をハードコードしていたため常に空欄だった。完了時ステータスに成果要約を書く運用と組み合わせる）
 - 見落としチェック → DA批判レビューに名称・概念を変更
   - テンプレート、実例、開発フロードキュメントを一括更新
 
 ### Fixed
+- `templates/scripts/dd-index-gen.sh`: アーカイブ判定が固定正規表現 `archived/` だったため、`doc/DD/archive/` 等の配置でアーカイブ済みDDが「進行中」に混入する問題（ARCHIVE_DIR 前方一致 + `archived?/` で判定）
+- アーカイブリマインダーフック（`post-bash-dd-archive-reminder.sh`）が `archive/`（d なし）配置では発火しない問題（`.dd-config` の ARCHIVE_DIR + `archived?/` を検出）
+- `templates/scripts/README.md` のTS参考実装2件: 4列ヘッダ表で補足セルをステータスと誤読する問題（`fields[4]` 優先分岐を除去し awk `$4`/`$5` と同一の解釈に）、完了済み「主な成果」列が常に空で出力される問題
 - `templates/scripts/dd-health.sh` の Windows gawk 正規表現バグ2件を修正（適用先プロジェクトの実DDで全Phase✅を実機確認）
   - 🔬絵文字（非BMP文字）は Windows の gawk の正規表現で照合できず、「🔬機械検証タスクがないPhase」が全DD・全Phaseで偽陽性になる問題（タスク文言「機械検証/机上突合/机上検証」での判定に変更）
   - 多バイト文字を含む正規表現では `.*` が絵文字を跨げず、Phaseタイトル切り出し `sub(/[:：].*/)` が「Phase 1: 設計（📐 x）」→「Phase 1� x）」のような切り残しになる問題（正規表現でなく index/substr で切る方式に変更）

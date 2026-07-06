@@ -8,6 +8,8 @@
 - **アーカイブ**: `doc/archived/DD/`
 - **テンプレート**: `templates/dd_template.md`
 - **インデックス**: `doc/DD/DD-INDEX.md`
+- **パス設定**: ルート直下 `.dd-config`（スクリプト・フックはここを読む。`templates/dd-config.example` 参照）
+- **ステータス**: 固定6種（検討中/進行中/確認待ち/保留/見送り/完了）+ 補足列（語彙ルール: `templates/guides.md` §3）
 
 ## 利用可能なスキル
 

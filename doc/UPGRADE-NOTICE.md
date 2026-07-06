@@ -1,5 +1,134 @@
 # DD-Know-How アップグレード通知
 
+> 💡 **使い方**: 導入先プロジェクトで Claude/Codex にこのファイルの該当バージョンの手順を渡し、「この手順で更新して」と依頼すればそのまま実行できる。
+
+## v4: ステータス固定語彙+補足列 / .dd-config パス基盤（2026-07-06）
+
+### 概要
+
+2つの構造問題への対応:
+
+1. **ステータス自由記述の限界**: ヘッダ表のステータス列に補足説明が混入し（例:「実装完了（Phase 0-2 完了・…未コミット）」）、KANBANビューア・DD-INDEX・ヘルスチェックの機械判定が不安定だった。→ **ステータスを固定6種に、説明は新設の補足列（4列目）へ**
+2. **導入先でのパスずれ再発**: パス設定がスクリプト本体への直書きだったため、(a) カレントディレクトリ依存で「DD directory not found」が頻発、(b) スクリプトを上書き更新するたび設定が消えていた。→ **設定をルート直下 `.dd-config` に分離し、スクリプトは自己位置からルートを解決（CWD非依存）**
+
+### 主な変更点
+
+- **ヘッダ表が4列に**: `| 作成日 | 更新日 | ステータス | 補足 |`（新規DDから適用。既存DDの3列も全ツールがそのまま読める）
+- **ステータス固定語彙6種**: `検討中` `進行中` `確認待ち` `保留` `見送り` `完了`（詳細: `templates/guides.md` §3）。終端（完了・見送り）になったらアーカイブする
+- **`.dd-config` 新設**（ルート直下）: `DD_DIR` / `ARCHIVE_DIR` / `DOC_DIR` の単一ソース。スクリプト・フックはこれを読む
+- **全スクリプトがCWD非依存に**: どのディレクトリから実行してもよい
+- `dd-index-gen.sh`: 「保留・見送り」セクションを自動生成（従来は常に空）。「主な成果」は補足列を優先。**アーカイブ判定が `archived/` 固定だったバグを修正**（`doc/DD/archive/` 等の配置でアーカイブ済みDDが「進行中」に混入していた）
+- `dd-health.sh`: ステータス語彙lint追加（固定6種以外を⚠️検出）。`見送り` のままアクティブに残るDDもクローズ漏れ扱いに
+- アーカイブリマインダーフック: `archive/` 配置でも発火するよう修正（従来は `archived/` のみ）
+
+### 配布物マップ（上書き可否 — 以後のアップグレード共通）
+
+| dd-know-how ソース | 導入先の配置 | 更新方針 |
+|---|---|---|
+| `templates/scripts/*.sh` | `scripts/` | **常に上書きOK**（プロジェクト固有設定を含まない） |
+| `templates/hooks/*.sh` `*.mjs` | `.claude/hooks/`（`.agents/hooks/`） | **上書きOK**（末尾にプロジェクト固有ルールを追記していた場合のみ再適用） |
+| `templates/dd-config.example` | ルート `.dd-config` | **初回のみ生成・以後上書き禁止**（プロジェクト固有の生存領域） |
+| `.claude/skills/dd/SKILL.md` | `.claude/skills/dd/` | 上書き後、旧版とdiffしてプロジェクト固有調整（パス等）を再適用 |
+| `templates/dd_template*.md` `guides.md` | `{テンプレートフォルダ}/` | 上書きOK（独自カスタムがあればマージ） |
+| `templates/CLAUDE.md.snippet` | `CLAUDE.md` | 追記マージのみ（上書き禁止） |
+| `doc/da-method.md` 等の方法論文書 | `doc/` | 上書きOK |
+
+### アップグレード手順（導入先プロジェクトのルートで実行）
+
+以下 `{KH}` = dd-know-how リポジトリのパス。事前に `{KH}` で `git pull` して最新化しておく。
+
+**1. 実レイアウトの確認**
+
+DDフォルダとアーカイブの実パスを確認する（プロジェクトにより `doc/DD` + `doc/archived/DD` / `doc/DD/archive` / `docs/DD` 等の揺れがある）:
+
+```bash
+ls -d doc/DD docs/DD doc/archived/DD doc/DD/archive 2>/dev/null
+```
+
+**2. `.dd-config` を作成**（既にあればスキップ）
+
+```bash
+cp {KH}/templates/dd-config.example .dd-config
+# エディタで DD_DIR / ARCHIVE_DIR / DOC_DIR をステップ1の実パスに合わせる
+```
+
+**3. スクリプトを上書きコピー**
+
+```bash
+cp {KH}/templates/scripts/dd-index-gen.sh {KH}/templates/scripts/dd-health.sh {KH}/templates/scripts/doc-check.sh scripts/
+# codex-review.sh を使っているプロジェクトのみ:
+cp {KH}/templates/scripts/codex-review.sh scripts/
+```
+
+**4. フックを上書きコピー**
+
+```bash
+cp {KH}/templates/hooks/post-bash-dd-archive-reminder.sh .claude/hooks/
+cp {KH}/templates/hooks/pre-edit-guard.sh .claude/hooks/   # 固有ルールを追記していた場合は末尾を再適用
+```
+
+**5. スキルを更新**
+
+```bash
+cp {KH}/.claude/skills/dd/SKILL.md .claude/skills/dd/SKILL.md
+```
+
+上書き後、旧版とのdiffを見てプロジェクト固有のパス調整があれば再適用する。
+
+**6. テンプレートを更新**
+
+```bash
+cp {KH}/templates/dd_template.md {KH}/templates/dd_template_tdd.md {KH}/templates/dd_template_e2e.md {KH}/templates/guides.md {テンプレートフォルダ}/
+```
+
+（`dd_template_bugfix.md` / `dd_template_mock.md` は今回変更なし。guides.md の節番号が変わったため tdd / e2e も同時更新が必要）
+
+**7. CLAUDE.md の「DD設定」に2行追記**
+
+```markdown
+- **パス設定**: ルート直下の `.dd-config`（スクリプト・フックはここを読む。上の実パスと常に一致させる）
+- **ステータス**: 固定6種（検討中/進行中/確認待ち/保留/見送り/完了）+ 補足列。語彙ルール: {テンプレートフォルダ}/guides.md §3
+```
+
+**8. 🔬 検証（必須）**
+
+```bash
+cd {適当なサブフォルダ} && bash ../scripts/dd-health.sh   # ← サブフォルダからでもエラーなく動くこと
+bash scripts/dd-index-gen.sh                               # DD-INDEX.md 再生成
+git diff --stat                                            # INDEX の変化を確認
+```
+
+INDEX の想定される変化: 進行中セクションが4列化 / 「保留・見送り」に該当DDが自動掲載 / `doc/DD/archive` 等の配置ではアーカイブ済みDDが「進行中」から「完了済み」へ移動（従来のバグ修正）。
+
+**9. TS移植版（dd-index-gen.ts）を使っているプロジェクトのみ**
+
+`{KH}/templates/scripts/README.md` の参考実装で `scripts/dd-index-gen.ts` を全面差し替えする（旧版には4列表で補足をステータスと誤読するバグがある）。
+
+### Codex（.agents 構成）の場合の差分
+
+- スキル: `{KH}/.agents/skills/dd/SKILL.md` → `.agents/skills/dd/SKILL.md`
+- フック: `.agents/hooks/` へコピー
+- 追記先: CLAUDE.md ではなく AGENTS.md（内容は同じ2行）
+- スクリプトは `dd-index-gen.sh` のみが標準構成
+
+### 既存DDへの影響
+
+- **新規DD**: 更新後のテンプレートで自動的に4列+固定語彙になる（`/dd new` のセルフチェックが語彙外を検出して矯正）
+- **進行中のDD**: そのまま動く（全ツールが3列/4列両対応）。**次にそのDDを触るタイミング**でヘッダ表を4列+固定語彙に書き換えると、KANBAN・INDEXがすぐ安定する
+- **アーカイブ済みDD**: 変更不要（遡及しない）。「主な成果」は従来どおりステータス欄の文言が使われ続ける
+- `dd-health.sh` に既存アクティブDDの「🏷️ 語彙外ステータス」警告が並ぶのは**想定内**。漸進的に解消すればよい（`--strict` をCIに入れている場合は移行完了までの間は注意）
+
+### トラブルシュート
+
+| 症状 | 原因と対処 |
+|------|-----------|
+| `ERROR: DDフォルダが見つかりません` | `.dd-config` 未作成またはパス誤り。エラーメッセージ内の例に従いルート直下に作成する |
+| アーカイブ済みDDが「進行中」に出る | `.dd-config` の `ARCHIVE_DIR` が実配置と不一致（例: `doc/DD/archive` なのに既定値のまま） |
+| KANBANで「ステータス不明」に入る | ステータスが固定6種の語彙外。`bash scripts/dd-health.sh` の語彙テーブルで一覧確認 |
+| 更新後もスクリプトが旧挙動 | コピー漏れ。`grep -l "dd-config" scripts/*.sh` で新版か確認できる |
+
+---
+
 ## v3: 実装前詳細化（2段階方式）導入（2026-05-03）
 
 ### 概要

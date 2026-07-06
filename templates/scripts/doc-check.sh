@@ -8,9 +8,12 @@
 # チェック2（リンク切れ検出）: DOC-MAP.md 内の `doc/...` パス参照のうち、
 #   実体が存在しないものを ERROR（「未作成」と明記された行はスキップ）。
 #
-# 使い方:
+# 使い方（どのディレクトリから実行してもよい・CWD非依存）:
 #   bash scripts/doc-check.sh
 #   bash scripts/doc-check.sh --doc-dir doc
+#
+# パス設定はプロジェクトルート直下の .dd-config（DOC_DIR）で行う。
+# 本スクリプトは全プロジェクト共通の配布物 — 直接編集しないこと。
 #
 # 終了コード: 0=整合 / 1=ERRORあり（precheck・CI に組み込める）
 # 注意: Windows + Git Bash ではファイル数百件規模で fork コストにより遅くなる
@@ -18,7 +21,24 @@
 # =============================================================================
 set -euo pipefail
 
-DOC_DIR="doc"
+# --- プロジェクトルート解決と .dd-config 読み込み（CWD非依存） ---
+# スクリプト自身の位置からルートを求める（想定配置: {ルート}/scripts/）。
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+if [ ! -f "$PROJECT_ROOT/.dd-config" ]; then
+    # scripts/ がルート直下にない配置向けフォールバック: 上方に .dd-config を探索
+    _p="$SCRIPT_DIR"
+    while [ -n "$_p" ] && [ "$_p" != "/" ] && [ "$_p" != "." ]; do
+        if [ -f "$_p/.dd-config" ]; then PROJECT_ROOT="$_p"; break; fi
+        _p="$(dirname "$_p")"
+    done
+fi
+cd "$PROJECT_ROOT"
+# shellcheck source=/dev/null
+[ -f .dd-config ] && . ./.dd-config
+
+DOC_DIR="${DOC_DIR:-doc}"
+DOC_DIR="${DOC_DIR%/}"
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --doc-dir) DOC_DIR="$2"; shift 2 ;;

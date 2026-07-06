@@ -83,6 +83,15 @@ cp dd-know-how/doc/spec-sync-check.md            doc/
 # CLAUDE.md をスニペットから作成（50行程度に収める。詳細は doc/ に置きポインタで参照）
 cp dd-know-how/templates/CLAUDE.md.snippet ./CLAUDE.md
 # → {...} プレースホルダ（プロジェクト説明・技術スタック・コマンド）を埋める
+
+# 運用スクリプトとパス設定（INDEX自動生成・ヘルスチェック・DOC-MAP検証）
+mkdir -p scripts
+cp dd-know-how/templates/scripts/dd-index-gen.sh \
+   dd-know-how/templates/scripts/dd-health.sh \
+   dd-know-how/templates/scripts/doc-check.sh  scripts/
+cp dd-know-how/templates/dd-config.example .dd-config
+# → .dd-config の DD_DIR / ARCHIVE_DIR / DOC_DIR を実配置に合わせる
+#   （スクリプト本体は編集禁止 — パスは .dd-config だけに書く。上書き更新で消えないため）
 ```
 
 **導入後に使えるコマンド:**
@@ -113,6 +122,8 @@ your-project/
 │   │   └── coding-standards.md    # コーディング基準書
 │   └── archived/
 │       └── DD/                    # アーカイブ済みDD
+├── scripts/                       # dd-index-gen.sh / dd-health.sh / doc-check.sh
+├── .dd-config                     # パス設定の単一ソース（スクリプト・フックが参照）
 └── CLAUDE.md                      # プロジェクト設定
 ```
 
@@ -137,8 +148,9 @@ DDテンプレートの記録テーブルにも品質フィルターのガイド
 | テンプレート | `doc/templates/` | DDテンプレート・作成ガイド・コーディング基準書 |
 | アーカイブ | `doc/archived/DD/` | 完了済みDDの保管先 |
 | スキル | `.claude/skills/` | Claude Code skills形式（固定） |
+| パス設定 | `.dd-config`（ルート直下） | スクリプト・フックが読む単一ソース |
 
-パスを変更する場合は、`/dd` スキル内のパス参照も合わせて修正してください。
+パスを変更する場合は、`.dd-config` と `/dd` スキル内・CLAUDE.md のパス参照も合わせて修正してください（スクリプト本体は修正不要）。
 
 ## 検証チェックリスト（必須・スキップ禁止）
 
@@ -154,6 +166,8 @@ DDテンプレートの記録テーブルにも品質フィルターのガイド
 - [ ] `doc/da-method.md` が配置されている
 - [ ] `doc/spec-sync-check.md` が配置されている（アーカイブ時の同期チェック手順）
 - [ ] CLAUDE.md が50行程度で、プロジェクト固有の設定（技術スタック・コマンド）が埋まっている
+- [ ] `.dd-config` がルート直下にあり、`DD_DIR` / `ARCHIVE_DIR` が実配置と一致している
+- [ ] `bash scripts/dd-index-gen.sh` がエラーなく完走し DD-INDEX.md が生成される
 
 ### パス整合性チェック（Level 2 必須）
 

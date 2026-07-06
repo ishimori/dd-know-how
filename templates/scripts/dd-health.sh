@@ -5,9 +5,13 @@
 # DDフォルダとアーカイブの全DDファイルを走査し、DD運用が「期待通り回っているか」
 # を機械検証する。テレメトリや追加のログ記録は不要 — DD本体そのものを分析する。
 #
-# 全体レポート:
+# 全体レポート（どのディレクトリから実行してもよい・CWD非依存）:
 #   bash scripts/dd-health.sh
 #   bash scripts/dd-health.sh --dd-dir doc/DD --archive-dir doc/archived/DD
+#
+# パス設定はプロジェクトルート直下の .dd-config（DD_DIR / ARCHIVE_DIR）で行う。
+# 本スクリプトは全プロジェクト共通の配布物 — プロジェクト固有の値をここに直接
+# 書かないこと（dd-know-how からの上書き更新で消えるため）。
 #
 # 単一DDの即時チェック（作成直後・アーカイブ前のセルフチェック）:
 #   bash scripts/dd-health.sh --dd DD-042          # アーカイブ前チェック（DA・ログも見る）
@@ -20,7 +24,8 @@
 #   - ログ形骸化（作成時スタブのまま）
 #   - DA批判レビュー表の雛形残置
 #   - テンプレ残骸（プレースホルダ・HTMLコメント）
-#   - ステータス語彙の表記ゆれ / DD-INDEX.md の鮮度
+#   - ステータス語彙lint（固定6種: 検討中/進行中/確認待ち/保留/見送り/完了 以外を検出）
+#   - DD-INDEX.md の鮮度
 #
 # 終了コード: 常に 0。--strict 指定時のみ、要対応（⚠️）があれば 1。
 # 高速化: dd-index-gen.sh と同様、ファイルごとのサブプロセス起動を排除し
@@ -29,8 +34,32 @@
 
 set -euo pipefail
 
-DD_DIR="doc/DD"
-ARCHIVE_DIR="doc/archived/DD"
+# --- プロジェクトルート解決と .dd-config 読み込み（CWD非依存） ---
+# スクリプト自身の位置からルートを求める（想定配置: {ルート}/scripts/）。
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+if [ ! -f "$PROJECT_ROOT/.dd-config" ]; then
+    # scripts/ がルート直下にない配置向けフォールバック: 上方に .dd-config を探索
+    _p="$SCRIPT_DIR"
+    while [ -n "$_p" ] && [ "$_p" != "/" ] && [ "$_p" != "." ]; do
+        if [ -f "$_p/.dd-config" ]; then PROJECT_ROOT="$_p"; break; fi
+        _p="$(dirname "$_p")"
+    done
+fi
+cd "$PROJECT_ROOT"
+# shellcheck source=/dev/null
+[ -f .dd-config ] && . ./.dd-config
+
+# --- Default paths（.dd-config が無い場合の既定値） ---
+DD_DIR="${DD_DIR:-doc/DD}"
+ARCHIVE_DIR="${ARCHIVE_DIR:-doc/archived/DD}"
+DD_DIR="${DD_DIR%/}"; ARCHIVE_DIR="${ARCHIVE_DIR%/}"
+# .dd-config なしで既定が外れている場合の救済: docs/ 配置を自動検出
+if [ ! -f .dd-config ] && [ ! -d "$DD_DIR" ] && [ -d "docs/DD" ]; then
+    DD_DIR="docs/DD"
+    [ -d "docs/archived/DD" ] && ARCHIVE_DIR="docs/archived/DD"
+fi
+
 TARGET_DD=""
 NEW_MODE=0
 STRICT=0
@@ -51,7 +80,13 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [ ! -d "$DD_DIR" ]; then
-    echo "ERROR: DD directory not found: $DD_DIR" >&2
+    {
+        echo "ERROR: DDフォルダが見つかりません: $DD_DIR（基準: $PROJECT_ROOT）"
+        echo "  対処: プロジェクトルート直下に .dd-config を作成し、実パスを設定してください。例:"
+        echo '    DD_DIR="doc/DD"'
+        echo '    ARCHIVE_DIR="doc/archived/DD"'
+        echo "  （一時的な指定は --dd-dir / --archive-dir 引数でも可）"
+    } >&2
     exit 1
 fi
 
@@ -181,6 +216,7 @@ if [ -n "$TARGET_DD" ]; then
     extract "single" "$FILE" | awk -F'\t' \
         -v today="$TODAY_MONO" -v fname="$(basename "$FILE")" -v is_active="$IS_ACTIVE" -v newmode="$NEW_MODE" '
 function mono(d,    a) { if (split(d, a, "-") != 3) return -1; return a[1]*372 + a[2]*31 + a[3] }
+function vocab_ok(s) { return (s == "検討中" || s == "進行中" || s == "確認待ち" || s == "保留" || s == "見送り" || s == "完了") }
 {
     created=$4; upd=$5; st=$6; logd=$7+0; dar=$8+0; das=$9+0
     ph=$10+0; hc=$11+0; ac_seen=$12+0; ac_rows=$13+0; ac_ex=$14+0
@@ -189,6 +225,7 @@ function mono(d,    a) { if (split(d, a, "-") != 3) return -1; return a[1]*372 +
     print "### " fname " ヘルスチェック"
     print ""
     if (created == "" || st == "") { print "- ⚠️ ヘッダ表（作成日/更新日/ステータス）を読み取れない → 冒頭の表を確認"; warn++ }
+    else if (!vocab_ok(st)) { print "- ⚠️ ステータス「" st "」が固定語彙外 → 検討中/進行中/確認待ち/保留/見送り/完了 のいずれかにし、説明・成果は補足列（4列目）へ"; warn++ }
     else print "- ✅ ヘッダ表: 作成 " created " / 更新 " upd " / ステータス「" st "」"
     if (ph + hc > 0) { print "- ⚠️ テンプレ残骸: プレースホルダ " ph "箇所・HTMLコメント " hc "箇所 → 除去する"; warn++ }
     else print "- ✅ テンプレ残骸なし"
@@ -205,8 +242,8 @@ function mono(d,    a) { if (split(d, a, "-") != 3) return -1; return a[1]*372 +
     }
     else if (dar > 0) print "- ✅ DA記録 " dar "行"
     else print "- ℹ️ DA記録なし（Phase完了時に記録）"
-    if (is_active == 1 && st ~ /完了|実装済|反映済|[Dd]one/ && st !~ /待ち/)
-        print "- 🗄️ ステータスが完了系のまま未アーカイブ → /dd archive を検討"
+    if (is_active == 1 && st ~ /完了|実装済|反映済|[Dd]one|見送り/ && st !~ /待ち/)
+        print "- 🗄️ ステータスが終端（完了/見送り系）のまま未アーカイブ → /dd archive を検討"
     exit (warn > 0 ? 10 : 0)
 }' || RC=$?
 
@@ -234,6 +271,7 @@ RC=0
 awk -F'\t' -v today="$TODAY_MONO" -v staled="$STALE_DAYS" -v waitd="$WAIT_DAYS" '
 function mono(d,    a) { if (split(d, a, "-") != 3) return -1; return a[1]*372 + a[2]*31 + a[3] }
 function app(a, b) { return (a == "" ? b : a " / " b) }
+function vocab_ok(s) { return (s == "検討中" || s == "進行中" || s == "確認待ち" || s == "保留" || s == "見送り" || s == "完了") }
 {
     loc=$1; num=$2; title=$3; upd=$5; st=$6
     logd=$7+0; dar=$8+0; das=$9+0; ph=$10+0; hc=$11+0
@@ -249,9 +287,10 @@ function app(a, b) { return (a == "" ? b : a " / " b) }
     age = (m < 0) ? -1 : today - m
     w = ""
     if (st == "" || st == "N/A") w = app(w, "⚠️ ステータス未設定")
+    else if (!vocab_ok(st)) w = app(w, "🏷️ 語彙外ステータス「" st "」→ 固定6種+補足列へ")
     if (st ~ /待ち|確認可/) {
         if (age > waitd) w = app(w, "⏸️ 確認・レビュー待ちのまま約" age "日")
-    } else if (st ~ /完了|実装済|反映済|[Dd]one|アーカイブ/) {
+    } else if (st ~ /完了|実装済|反映済|[Dd]one|アーカイブ|見送り/) {
         w = app(w, "🗄️ クローズ漏れ（「" st "」だが未アーカイブ）")
     } else if (age > staled) {
         w = app(w, "🧊 更新が約" age "日停止（「" st "」のまま）")
@@ -281,14 +320,21 @@ END {
 ' "$TSV" || RC=$?
 
 echo ""
-echo "## ステータス語彙（表記ゆれの確認）"
+echo "## ステータス語彙（アクティブDD・固定6種チェック）"
 echo ""
-echo "| ステータス | 件数 |"
-echo "|-----------|------|"
-cut -f6 "$TSV" | awk '{ print ($0 == "" ? "(ヘッダ表なし)" : $0) }' | sort | uniq -c | sort -rn | head -15 | \
-    sed -E 's/^ *([0-9]+) (.*)$/| \2 | \1 |/'
+echo "| ステータス | 件数 | 判定 |"
+echo "|-----------|------|------|"
+awk -F'\t' '$1 == "active" { print ($6 == "" ? "(ヘッダ表なし)" : $6) }' "$TSV" | sort | uniq -c | sort -rn | head -15 | \
+    awk '{
+        n = $1
+        s = $0; sub(/^[ \t]*[0-9]+ /, "", s)
+        if (s == "(ヘッダ表なし)") mark = "—"
+        else if (s == "検討中" || s == "進行中" || s == "確認待ち" || s == "保留" || s == "見送り" || s == "完了") mark = "✅"
+        else mark = "⚠️ 語彙外"
+        printf "| %s | %s | %s |\n", s, n, mark
+    }'
 echo ""
-echo "> 同義の表記ゆれ（例: 完了 / ✅ 完了 / **完了**）は統一を推奨。完了系なのにアクティブなDDは「要対応」に出ます。"
+echo "> ステータスは固定6種（検討中/進行中/確認待ち/保留/見送り/完了）のみ。説明・成果は補足列（4列目）へ書く。語彙外の既存DDは、次にそのDDを触るタイミングで移行すればよい（アーカイブ済みへの遡及は不要）。"
 
 # --- DD-INDEX.md の鮮度（アクティブDDより古ければ再生成を促す） ---
 if [ -f "$DD_DIR/DD-INDEX.md" ] && [ ${#DD_FILES[@]} -gt 0 ]; then

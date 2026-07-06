@@ -11,7 +11,26 @@
 #                                [--uncommitted | --base main | --commit <sha>] \
 #                                [--effort low|medium|high|xhigh]
 # effort既定: レビュー=high / --smoke=low（xhighはDD起票時の明示指示か複雑な差分のみ）
+#
+# どのディレクトリから実行してもよい（CWD非依存）。相対パス引数（--request/--out）は
+# プロジェクトルート基準で解釈される。
 set -euo pipefail
+
+# --- プロジェクトルート解決と .dd-config 読み込み（CWD非依存） ---
+# スクリプト自身の位置からルートを求める（想定配置: {ルート}/scripts/）。
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+if [ ! -f "$PROJECT_ROOT/.dd-config" ]; then
+    # scripts/ がルート直下にない配置向けフォールバック: 上方に .dd-config を探索
+    _p="$SCRIPT_DIR"
+    while [ -n "$_p" ] && [ "$_p" != "/" ] && [ "$_p" != "." ]; do
+        if [ -f "$_p/.dd-config" ]; then PROJECT_ROOT="$_p"; break; fi
+        _p="$(dirname "$_p")"
+    done
+fi
+cd "$PROJECT_ROOT"
+# shellcheck source=/dev/null
+[ -f .dd-config ] && . ./.dd-config
 
 usage() {
   sed -n '2,13p' "$0" | sed 's/^# \{0,1\}//'
