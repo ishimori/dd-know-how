@@ -3,10 +3,63 @@
 > 💡 **使い方**: 導入先プロジェクトで作業中の Claude/Codex に、**このファイルの絶対パスと対象バージョンを添えて**依頼するとそのまま実行できる。別リポジトリからは相対参照だと場所を特定できないため、絶対パスが確実:
 >
 > ```
-> c:\repo\dd-know-how の doc/UPGRADE-NOTICE.md の v4 手順で更新して
+> c:\repo\dd-know-how の doc/UPGRADE-NOTICE.md の v5 手順で更新して
 > ```
 >
 > 呼び出し口（`scripts/dd-update.sh`）が入る2回目以降は、各プロジェクトで `bash scripts/dd-update.sh`（または「DDスキルを更新して」）だけで済む。本手順書が要るのは初回のみ。
+
+## v5: AGENTS.md 正本化 — Claude Code / Codex 両対応で二重管理を排除（2026-07-07）
+
+### 概要
+
+指示ファイル（CLAUDE.md / AGENTS.md）とスキル（`.claude/skills/` / `.agents/skills/`）の手動二重管理をやめ、**「正本は1つ、他方はポインタか生成物」** に統一:
+
+1. **指示ファイル**: AGENTS.md が正本（Codex が直接読む）。CLAUDE.md は `@AGENTS.md` インポート1行のポインタ（Claude Code は AGENTS.md をネイティブに読まないため、公式推奨のインポート方式で参照する。Windows でシンボリックリンク不要）
+2. **スキル**: `.claude/skills/` が正本。`.agents/skills/`（Codex 用）は dd-know-how 側で `tools/skills-sync.sh` が生成するミラーになり、配布（dd-update / setup）も常に正本からコピーされる
+
+背景: 旧・手動ミラーの `.agents/` 側は v4 の変更（仕様書同期チェック・知見昇格・dd-health・dd-update 手順・`.dd-config`・ステータス固定語彙）を含まない古いコピーのまま配布されていた。本変更でこのドリフトと再発経路を解消。
+
+### アップグレード手順（導入先プロジェクトのルートで実行）
+
+**Claude Code だけで使っているプロジェクトは必須作業なし**（CLAUDE.md 構成のまま全機能が動く。`bash scripts/dd-update.sh` で通常更新だけ入れればよい）。**Codex でも使えるようにする場合**のみ以下を実施:
+
+**1. 配布物を最新化**
+
+```bash
+bash scripts/dd-update.sh
+```
+
+**2. 指示ファイルを正本+ポインタ構成に組み替え**
+
+```bash
+git mv CLAUDE.md AGENTS.md   # 既存の内容がそのまま正本になる
+printf '@AGENTS.md\n\n> 正本は AGENTS.md（全エージェント共通）。Claude Code 固有の指示が必要になった場合のみ、この下に追記する。\n' > CLAUDE.md
+```
+
+（既に AGENTS.md が別内容で存在する場合はリネームせず、CLAUDE.md 固有の内容を AGENTS.md にマージしてから CLAUDE.md をポインタ化する）
+
+**3. Codex 用スキルミラーを配置**
+
+```bash
+mkdir -p .agents/skills/dd
+cp .claude/skills/dd/SKILL.md .agents/skills/dd/
+```
+
+以後は `bash scripts/dd-update.sh` が両方の置き場を正本から更新する。
+
+**4. 🔬 検証（必須）**
+
+```bash
+diff .claude/skills/dd/SKILL.md .agents/skills/dd/SKILL.md   # 差分なしであること
+head -1 CLAUDE.md                                            # 「@AGENTS.md」であること
+```
+
+Claude Code を再起動し、AGENTS.md の内容（DD設定等）を認識しているか確認する（**初回は `@AGENTS.md` インポートの承認ダイアログが出る — 承認する**）。Codex 側は `$dd list` 等でスキルが見えることを確認。
+
+### 補足
+
+- hooks（pre-edit-guard 等）は Claude Code 固有の機構で、Codex では効かない。「DD-INDEX.md はスクリプト経由でのみ更新」等のルールは AGENTS.md の記載が Codex 側のガードレールになる
+- 旧 `.agents/skills/dd/SKILL.md`（手動ミラー時代の古いコピー）を使っていた場合、ステップ1の dd-update で正本と同一内容に更新される
 
 ## v4: ステータス固定語彙+補足列 / .dd-config パス基盤（2026-07-06）
 

@@ -141,13 +141,13 @@ for hd in .claude/hooks .agents/hooks; do
     fi
 done
 
-# 3) スキル（導入済みのミラーにのみ。それぞれ対応するソースから）
-if [ -f .claude/skills/dd/SKILL.md ]; then
-    put "$KH/.claude/skills/dd/SKILL.md" ".claude/skills/dd/SKILL.md"
-fi
-if [ -f .agents/skills/dd/SKILL.md ]; then
-    put "$KH/.agents/skills/dd/SKILL.md" ".agents/skills/dd/SKILL.md"
-fi
+# 3) スキル（正本 .claude/skills/ を単一ソースに、導入済みの各置き場へ。
+#    .agents/skills/ は Codex 用ミラー — dd-know-how 側の .agents/ からはコピーしない）
+for sd in .claude/skills .agents/skills; do
+    if [ -f "$sd/dd/SKILL.md" ]; then
+        put "$KH/.claude/skills/dd/SKILL.md" "$sd/dd/SKILL.md"
+    fi
+done
 
 # 4) テンプレート
 if [ -n "$TPL_DIR" ]; then
@@ -191,7 +191,7 @@ if [ "$DRY" -eq 0 ]; then
     echo "次にやること:"
     echo "  1. 差分を確認する（git diff）"
     echo "  2. 問題なければコミットする（このスクリプトはコミットしません）"
-    echo "  3. スキル・フックの変更は Claude Code の再起動後に有効"
+    echo "  3. スキル・フックの変更はエージェント（Claude Code / Codex）の再起動後に有効"
 else
     echo ""
     echo "実際に取り込むには --dry-run なしで再実行してください"

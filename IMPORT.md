@@ -2,6 +2,8 @@
 
 自分のプロジェクトに DD-Know-How を導入する手順です。
 
+> **Claude Code / Codex 両対応**: 指示ファイルは AGENTS.md が正本（Codex は直接、Claude Code は CLAUDE.md の `@AGENTS.md` インポート経由で読む）。スキルは同一内容を `.claude/skills/`（Claude Code）と `.agents/skills/`（Codex）に配置します。二重管理は発生しません。
+
 ## 何が手に入るか
 
 | 機能 | 効果 |
@@ -29,7 +31,7 @@
 | DDフォルダ構造 | ✅ | ✅ |
 | `/dd` スキル（作成・参照・一覧・検索・アーカイブ） | - | ✅ |
 | DA メソッド文書（DA品質フィルター・再チェック条件） | - | ✅ |
-| CLAUDE.md テンプレート | - | ✅ |
+| AGENTS.md / CLAUDE.md テンプレート | - | ✅ |
 
 ## セットアップ
 
@@ -43,7 +45,7 @@ claude
 > /setup /path/to/your-project
 ```
 
-対話的にレベル選択・パス設定が行われます。
+対話的にレベル選択・パス設定が行われます。（Codex の場合は `codex` を起動し `$setup /path/to/your-project`）
 
 ### 方法2: 手動セットアップ
 
@@ -74,15 +76,18 @@ mv doc/templates/engineering-patterns.md doc/templates/decisions.md doc/
 Level 1 のファイルに加えて:
 
 ```bash
-# スキルをコピー
-mkdir -p .claude/skills/dd doc/
+# スキルをコピー（.claude = Claude Code 用 / .agents = Codex 用。内容は同一 — 正本は .claude 側）
+mkdir -p .claude/skills/dd .agents/skills/dd doc/
 cp dd-know-how/.claude/skills/dd/SKILL.md        .claude/skills/dd/
+cp dd-know-how/.claude/skills/dd/SKILL.md        .agents/skills/dd/
 cp dd-know-how/doc/da-method.md                  doc/
 cp dd-know-how/doc/spec-sync-check.md            doc/
 
-# CLAUDE.md をスニペットから作成（50行程度に収める。詳細は doc/ に置きポインタで参照）
+# 指示ファイルを作成（AGENTS.md が正本・50行程度。CLAUDE.md は @AGENTS.md ポインタ）
+cp dd-know-how/templates/AGENTS.md.snippet ./AGENTS.md
 cp dd-know-how/templates/CLAUDE.md.snippet ./CLAUDE.md
-# → {...} プレースホルダ（プロジェクト説明・技術スタック・コマンド）を埋める
+# → AGENTS.md の {...} プレースホルダ（プロジェクト説明・技術スタック・コマンド）を埋める
+#   CLAUDE.md は編集不要（Claude Code 固有の指示が必要になった時だけ追記する）
 
 # 運用スクリプトとパス設定（INDEX自動生成・ヘルスチェック・DOC-MAP検証）
 mkdir -p scripts
@@ -107,8 +112,12 @@ your-project/
 ├── .claude/
 │   └── skills/
 │       ├── dd/
-│       │   └── SKILL.md           # DD操作（~120行、軽量）
+│       │   └── SKILL.md           # DD操作（~150行、軽量）— Claude Code 用
 │       └── (プロジェクト固有のスキルを追加可能)
+├── .agents/
+│   └── skills/
+│       └── dd/
+│           └── SKILL.md           # 同一内容の Codex 用ミラー（dd-update が両方を更新）
 ├── doc/
 │   ├── DOC-MAP.md                 # ドキュメントインデックス（追加・移動時に更新）
 │   ├── DD/                        # DD設計書（進行中）
@@ -124,7 +133,8 @@ your-project/
 │       └── DD/                    # アーカイブ済みDD
 ├── scripts/                       # dd-index-gen.sh / dd-health.sh / doc-check.sh
 ├── .dd-config                     # パス設定の単一ソース（スクリプト・フックが参照）
-└── CLAUDE.md                      # プロジェクト設定
+├── AGENTS.md                      # プロジェクト設定の正本（全エージェント共通）
+└── CLAUDE.md                      # @AGENTS.md ポインタ（Claude Code 用・1行）
 ```
 
 ## DA品質フィルターについて
@@ -147,10 +157,10 @@ DDテンプレートの記録テーブルにも品質フィルターのガイド
 | DDフォルダ | `doc/DD/` | 進行中のDD設計書を配置 |
 | テンプレート | `doc/templates/` | DDテンプレート・作成ガイド・コーディング基準書 |
 | アーカイブ | `doc/archived/DD/` | 完了済みDDの保管先 |
-| スキル | `.claude/skills/` | Claude Code skills形式（固定） |
+| スキル | `.claude/skills/` + `.agents/skills/` | Agent Skills 形式（固定）。前者を Claude Code、後者を Codex が読む — 内容は同一 |
 | パス設定 | `.dd-config`（ルート直下） | スクリプト・フックが読む単一ソース |
 
-パスを変更する場合は、`.dd-config` と `/dd` スキル内・CLAUDE.md のパス参照も合わせて修正してください（スクリプト本体は修正不要）。
+パスを変更する場合は、`.dd-config` と `/dd` スキル内・AGENTS.md のパス参照も合わせて修正してください（スクリプト本体は修正不要）。
 
 ## 検証チェックリスト（必須・スキップ禁止）
 
@@ -165,23 +175,25 @@ DDテンプレートの記録テーブルにも品質フィルターのガイド
 ### Level 2（Level 1 に加えて）
 - [ ] `doc/da-method.md` が配置されている
 - [ ] `doc/spec-sync-check.md` が配置されている（アーカイブ時の同期チェック手順）
-- [ ] CLAUDE.md が50行程度で、プロジェクト固有の設定（技術スタック・コマンド）が埋まっている
+- [ ] AGENTS.md が50行程度で、プロジェクト固有の設定（技術スタック・コマンド）が埋まっている
+- [ ] CLAUDE.md の冒頭に `@AGENTS.md` インポート行がある
+- [ ] `.agents/skills/dd/SKILL.md` が `.claude/skills/dd/SKILL.md` と同一内容（`diff` で確認）
 - [ ] `.dd-config` がルート直下にあり、`DD_DIR` / `ARCHIVE_DIR` が実配置と一致している
 - [ ] `bash scripts/dd-index-gen.sh` がエラーなく完走し DD-INDEX.md が生成される
 
 ### パス整合性チェック（Level 2 必須）
 
-CLAUDE.md と SKILL.md 内のパス参照が、実際のファイル配置と一致しているか `ls` で確認する。**不一致がある場合はファイル内のパスを修正してから再確認する。全パスの存在確認が完了するまでセットアップ完了としないこと。**
+AGENTS.md と SKILL.md 内のパス参照が、実際のファイル配置と一致しているか `ls` で確認する。**不一致がある場合はファイル内のパスを修正してから再確認する。全パスの存在確認が完了するまでセットアップ完了としないこと。**
 
 | # | 検証対象 | 確認内容 |
 |---|---------|---------|
-| 1 | CLAUDE.md の `テンプレート` 行 | 記載パスに `dd_template.md` が存在するか |
+| 1 | AGENTS.md の `テンプレート` 行 | 記載パスに `dd_template.md` が存在するか |
 | 2 | SKILL.md の `templates/guides.md` 参照 | 記載パスに `guides.md` が存在するか |
 | 3 | SKILL.md の `doc/da-method.md` 参照 | 記載パスに `da-method.md` が存在するか |
 
 ```
 ✓ パス整合性チェック:
-  CLAUDE.md テンプレート → doc/templates/dd_template.md  ✓ 存在確認
+  AGENTS.md テンプレート → doc/templates/dd_template.md  ✓ 存在確認
   SKILL.md guides.md    → doc/templates/guides.md        ✓ 存在確認
   SKILL.md da-method.md → doc/da-method.md               ✓ 存在確認
 ```
@@ -202,12 +214,13 @@ CLAUDE.md と SKILL.md 内のパス参照が、実際のファイル配置と一
 ## トラブルシューティング
 
 ### スキルが認識されない
-- `.claude/skills/{スキル名}/SKILL.md` の配置を確認（`SKILL.md` が正しいファイル名）
-- Claude Code を再起動
+- Claude Code: `.claude/skills/{スキル名}/SKILL.md` の配置を確認（`SKILL.md` が正しいファイル名）
+- Codex: `.agents/skills/{スキル名}/SKILL.md` の配置を確認
+- エージェントを再起動
 
 ### DDの作成先が意図と違う
 - `/dd` スキル内のパス設定を確認
-- CLAUDE.md の DDフォルダ記載と一致しているか確認
+- AGENTS.md の DDフォルダ記載と一致しているか確認
 
 ### テンプレートが見つからない
 - `doc/templates/dd_template.md` の存在を確認

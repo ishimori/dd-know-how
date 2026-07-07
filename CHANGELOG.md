@@ -7,6 +7,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- **AGENTS.md 正本化 — Claude Code / Codex 両対応で二重管理を排除**
+  - 指示ファイル: AGENTS.md を正本に、CLAUDE.md は `@AGENTS.md` インポート1行のポインタに（ルート・`templates/*.snippet` とも。Claude Code 公式推奨のインポート方式で、Windows でシンボリックリンク不要）
+  - スキル: `.claude/skills/` を正本とし、`.agents/skills/`（Codex 用）は新設の `tools/skills-sync.sh` で生成するミラーに（`--check` でドリフト検出）。旧・手動ミラーが v4 変更（仕様書同期・知見昇格・dd-health・dd-update 手順）を欠いたまま残っていたドリフトを解消
+  - `tools/dd-update-core.sh`: スキル配布を正本（`.claude/skills/`）単一ソースから導入先の両置き場（`.claude` / `.agents` の存在する方）へコピーする方式に変更 — 導入先へのドリフト伝播を停止
+  - `/setup`: AGENTS.md（正本・50行程度）+ CLAUDE.md（ポインタ）を生成する方式に更新。スキルは両置き場へ配置し、パス整合性チェックに「CLAUDE.md の `@AGENTS.md`」「ミラー同一性（diff）」を追加
+  - ドキュメント両対応化: README / IMPORT.md / other-environments.md を更新、`doc/UPGRADE-NOTICE.md` に v5 移行手順（Claude Code のみのプロジェクトは必須作業なし）
 - **Pull型更新（`dd-update.sh`）**: 各プロジェクト側から `bash scripts/dd-update.sh` 一発で dd-know-how の最新配布物（scripts / hooks / スキル / テンプレート / 方法論文書）を取り込む
   - 呼び出し口スタブだけを各プロジェクトに配布し、本体（`tools/dd-update-core.sh`）は dd-know-how 側に常駐 — スタブが exec するため更新ロジック自体の配り直しが不要
   - dd-know-how の場所は既定で兄弟ディレクトリ `../dd-know-how`（`.dd-config` の `SOURCE_REPO` で変更可）。テンプレートフォルダは実在検出（`TEMPLATES_DIR` で明示も可）

@@ -10,7 +10,7 @@ DDノウハウをプロジェクトに合わせて調整するためのガイド
 | 開発フローのステップ数 | 3, 5, 7, 9ステップから選択 | [development-flow-variants.md](development-flow-variants.md) |
 | フォルダパス | `doc/DD/` 以外のパスを使用 | 本ファイル参照 |
 | コマンド名 | `/dd` 以外のコマンド名を使用 | 本ファイル参照 |
-| 他の環境での使用 | Claude Code以外のAI/手動運用 | [other-environments.md](other-environments.md) |
+| 他の環境での使用 | Claude Code / Codex 以外のAI/手動運用 | [other-environments.md](other-environments.md) |
 
 ## フォルダパスのカスタマイズ
 
@@ -37,8 +37,9 @@ doc/
 ```
 
 **変更箇所:**
-- `CLAUDE.md.snippet` のパス参照
-- `commands/dd.md` のパス参照
+- `.dd-config` の `DD_DIR` / `ARCHIVE_DIR`
+- `AGENTS.md.snippet` のパス参照
+- `.claude/skills/dd/SKILL.md` のパス参照（変更後は `.agents/skills/dd/` ミラーにも同内容を反映）
 
 ### 例2: プロジェクトルート直下
 
@@ -55,16 +56,17 @@ design/
 
 ### 例: `/doc` を使用
 
-1. `commands/dd.md` を `commands/doc.md` にリネーム
+1. `.claude/skills/dd/` を `.claude/skills/doc/` にリネーム（SKILL.md の `name:` も変更）
 2. ファイル内の説明を適宜修正
-3. `CLAUDE.md.snippet` のコマンド名参照を修正
+3. AGENTS.md のコマンド名参照を修正
+4. `.agents/skills/` ミラーにも同じ変更を反映
 
 ### 例: `/design` を使用
 
 DDを「Design Document」として明示的に呼ぶ場合。
 
-1. `commands/dd.md` を `commands/design.md` にリネーム
-2. CLAUDE.mdの説明を「Design Documentの操作」に変更
+1. `.claude/skills/dd/` を `.claude/skills/design/` にリネーム（`.agents/skills/` も同様）
+2. AGENTS.md の説明を「Design Documentの操作」に変更
 
 ## 仕様書パスのカスタマイズ
 
@@ -91,7 +93,7 @@ doc/spec/
 ```
 
 **変更箇所:**
-- `commands/dd.md` の仕様書同期チェック部分
+- `.claude/skills/dd/SKILL.md` の仕様書同期チェック参照部分（`.agents/skills/dd/` ミラーにも反映）
 - `spec-sync-check.md` のパス参照
 
 ## 日本語/英語の切り替え
@@ -187,4 +189,4 @@ DDに「リスク」セクションを追加：
 
 - [template-sections.md](template-sections.md) - テンプレートのセクション追加例
 - [development-flow-variants.md](development-flow-variants.md) - 開発フローのステップ数調整
-- [other-environments.md](other-environments.md) - Claude Code以外の環境での使用方法
+- [other-environments.md](other-environments.md) - Claude Code / Codex 以外の環境での使用方法
