@@ -29,8 +29,9 @@ if [ ! -f "$PROJECT_ROOT/.dd-config" ]; then
     done
 fi
 cd "$PROJECT_ROOT"
-# shellcheck source=/dev/null
-[ -f .dd-config ] && . ./.dd-config
+# 注: このスクリプトは .dd-config の値を使用しない（PROJECT_ROOT 解決に存在だけ利用）。
+#     以前は . ./.dd-config していたが、設定ファイルの source は任意コード実行の
+#     リスクがあるため廃止した。値が必要な他スクリプトは dd_config_get で厳格抽出する。
 
 usage() {
   sed -n '2,13p' "$0" | sed 's/^# \{0,1\}//'

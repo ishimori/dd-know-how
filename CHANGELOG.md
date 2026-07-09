@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Security
+- **配布フック/スクリプトのガードレール堅牢化（v6）** — 利用先での自動セキュリティレビュー指摘3件＋補足への対応。ミラー（`.codex` / `.agents`）は正本と同一のため配布元 `templates/` 側で一括修正
+  - **`.dd-config` の `source` による任意コード実行を排除**（深刻度: 高）: 設定ファイルを `source` していた7か所（`post-bash-dd-archive-reminder.sh` / `dd-index-gen.sh` / `dd-health.sh` / `doc-check.sh` / `dd-update.sh` / `dd-update-core.sh` と、値未使用の `codex-review.sh`）を、`source` せず必要キーだけを厳格抽出する `dd_config_get()` に置換。値のホワイトリストは `[A-Za-z0-9 ._:/~-]`（Windows パスのコロンを含む）。`$( )` `;` `` ` `` 等を含む行は無視され実行されない。`.dd-config` は pre-edit-guard の保護対象にも追加
+  - **pre-edit-guard の Windows バイパスを修正**（深刻度: 中〜高）: 判定前にパスを正規化（バックスラッシュ→スラッシュ、重複スラッシュ・冗長 `./..` の畳み込み〔`tr -s` + `realpath -m`〕、小文字化）。従来は実 JSON のエスケープされたバックスラッシュ（`\\`）が `//` に化けて `.claude/settings.json` 保護を素通りし、`.CLAUDE`（大文字）や `./` 経由でもバイパスできた
+  - **ガード保護対象を「ガードレール一式」に一般化**（深刻度: 中）: 従来の `.claude/settings*.json` 2種に加え、フック本体（`.claude/hooks/*`）・Codex 系（`.codex/hooks.json` / `.codex/hooks/*`）・`.agents/hooks/*`・`.dd-config` を保護（フックを `exit 0` に書き換えてガードを無効化する経路を封鎖）。`dd-update-core.sh` のフック配布先にも `.codex/hooks` を追加
+  - **JSON パースの頑健化**: `file_path` 抽出を jq 優先・grep/sed フォールバックに。パス特定不可時はフェイルオープン（過剰ブロックによるロックアウト回避）で、シンボリックリンク別名と併せ残存リスクとして各ヘッダ／README に明記
+  - 回帰確認: ガード14ベクタ（バイパス6・保護8）と正常系、悪意ある `.dd-config` での全スクリプト実行でRCE不発かつパス読取り正常を実測
+
 ### Added
 - **AGENTS.md 正本化 — Claude Code / Codex 両対応で二重管理を排除**
   - 指示ファイル: AGENTS.md を正本に、CLAUDE.md は `@AGENTS.md` インポート1行のポインタに（ルート・`templates/*.snippet` とも。Claude Code 公式推奨のインポート方式で、Windows でシンボリックリンク不要）

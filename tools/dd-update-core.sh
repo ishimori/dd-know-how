@@ -84,10 +84,19 @@ fi
 
 cd "$TARGET"
 
+# .dd-config を安全に読む（source しない = 設定ファイル内の任意コード実行を防止）。
+# KEY="value" / KEY=value 形式の行から、パスとして妥当な文字だけを1件抽出する。
+dd_config_get() {  # dd_config_get KEY FILE
+    [ -f "$2" ] || return 0
+    sed -n "s|^[[:space:]]*${1}[[:space:]]*=[[:space:]]*\"\{0,1\}\([A-Za-z0-9 ._:/~-]*\)\"\{0,1\}[[:space:]]*\$|\1|p" "$2" 2>/dev/null | head -1
+}
+
 # --- .dd-config（無ければ実レイアウトから生成。既存ファイルは不可侵） ---
 if [ -f .dd-config ]; then
-    # shellcheck source=/dev/null
-    . ./.dd-config
+    DD_DIR="$(dd_config_get DD_DIR .dd-config)"
+    ARCHIVE_DIR="$(dd_config_get ARCHIVE_DIR .dd-config)"
+    DOC_DIR="$(dd_config_get DOC_DIR .dd-config)"
+    TEMPLATES_DIR="$(dd_config_get TEMPLATES_DIR .dd-config)"
 else
     dd_guess="doc/DD"
     [ ! -d doc/DD ] && [ -d docs/DD ] && dd_guess="docs/DD"
@@ -131,8 +140,8 @@ if [ -f scripts/codex-review.sh ]; then
     put "$KH/templates/scripts/codex-review.sh" "scripts/codex-review.sh"
 fi
 
-# 2) hooks（.claude / .agents の導入済みディレクトリにのみ）
-for hd in .claude/hooks .agents/hooks; do
+# 2) hooks（.claude / .codex / .agents の導入済みディレクトリにのみ）
+for hd in .claude/hooks .codex/hooks .agents/hooks; do
     [ -d "$hd" ] || continue
     put "$KH/templates/hooks/post-bash-dd-archive-reminder.sh" "$hd/post-bash-dd-archive-reminder.sh"
     put "$KH/templates/hooks/pre-edit-guard.sh" "$hd/pre-edit-guard.sh"

@@ -23,8 +23,12 @@ if [ ! -f "$PROJECT_ROOT/.dd-config" ]; then
         _p="$(dirname "$_p")"
     done
 fi
-# shellcheck source=/dev/null
-[ -f "$PROJECT_ROOT/.dd-config" ] && . "$PROJECT_ROOT/.dd-config"
+# .dd-config を安全に読む（source しない = 設定ファイル内の任意コード実行を防止）。
+dd_config_get() {  # dd_config_get KEY FILE
+    [ -f "$2" ] || return 0
+    sed -n "s|^[[:space:]]*${1}[[:space:]]*=[[:space:]]*\"\{0,1\}\([A-Za-z0-9 ._:/~-]*\)\"\{0,1\}[[:space:]]*\$|\1|p" "$2" 2>/dev/null | head -1
+}
+SOURCE_REPO="$(dd_config_get SOURCE_REPO "$PROJECT_ROOT/.dd-config")"
 
 SOURCE_REPO="${SOURCE_REPO:-$PROJECT_ROOT/../dd-know-how}"
 CORE="$SOURCE_REPO/tools/dd-update-core.sh"

@@ -15,11 +15,18 @@ COMMAND=$(echo "$INPUT" | grep -o '"command"[[:space:]]*:[[:space:]]*"[^"]*"' | 
 # プロジェクトルート（想定配置: {ルート}/.claude/hooks/ または {ルート}/.agents/hooks/）の
 # .dd-config から ARCHIVE_DIR を読み、検出パターンに加える。失敗しても既定パターンで動く。
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd)" || SCRIPT_DIR=""
+
+# .dd-config を安全に読む（source しない = 設定ファイル内の任意コード実行を防止）。
+# KEY="value" / KEY=value 形式の行から、パスとして妥当な文字だけを1件抽出する。
+dd_config_get() {  # dd_config_get KEY FILE
+    [ -f "$2" ] || return 0
+    sed -n "s|^[[:space:]]*${1}[[:space:]]*=[[:space:]]*\"\{0,1\}\([A-Za-z0-9 ._:/~-]*\)\"\{0,1\}[[:space:]]*\$|\1|p" "$2" 2>/dev/null | head -1
+}
+
 ARCHIVE_PAT="archived?/"
-if [ -n "$SCRIPT_DIR" ] && [ -f "$SCRIPT_DIR/../../.dd-config" ]; then
-    # shellcheck source=/dev/null
-    . "$SCRIPT_DIR/../../.dd-config" 2>/dev/null || true
-    if [ -n "${ARCHIVE_DIR:-}" ]; then
+if [ -n "$SCRIPT_DIR" ]; then
+    ARCHIVE_DIR="$(dd_config_get ARCHIVE_DIR "$SCRIPT_DIR/../../.dd-config")"
+    if [ -n "$ARCHIVE_DIR" ]; then
         # 正規表現メタ文字を最低限エスケープしてパターンに合流
         _esc=$(printf '%s' "${ARCHIVE_DIR%/}" | sed 's/[].[^$*\\]/\\&/g')
         ARCHIVE_PAT="($_esc/|archived?/)"
