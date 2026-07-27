@@ -23,7 +23,7 @@
 - `/dd search キーワード` - DD検索
 - `/dd rebuild-index` - インデックス再構築
 - `/dd health` - DD運用ヘルスチェック（滞留・クローズ漏れ・形骸化の検出）
-- DA メソッド: `doc/da-method.md`（DA品質フィルター・再チェック条件）
+- DA 深掘り手法（参考文書）: `doc/da-method.md`
 - `/setup パス` - 外部プロジェクトへDD導入
 
 （Codex ではスラッシュの代わりに `$dd` / `$setup` で呼び出す）

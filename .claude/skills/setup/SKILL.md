@@ -41,7 +41,7 @@ description: DD設計書セットアップコマンド
 | レベル | 内容 | 推奨ケース |
 |--------|------|------------|
 | Level 1（最小） | テンプレート + 基本ルール | まず試したい |
-| Level 2（標準） | + /dd コマンド + DA メソッド文書 | 通常利用 |
+| Level 2（標準） | + /dd コマンド + 方法論文書 | 通常利用 |
 
 ### 3. DDフォルダの配置先を決定
 
@@ -98,7 +98,7 @@ description: DD設計書セットアップコマンド
 │       └── dd/
 │           └── SKILL.md      # ← 同じ正本ファイルをコピー（Codex 用ミラー。内容は .claude 側と同一）
 ├── doc/
-│   ├── da-method.md          # ← doc/da-method.md（DA品質フィルター・再チェック条件）
+│   ├── da-method.md          # ← doc/da-method.md（参考: DA深掘り手法）
 │   └── spec-sync-check.md    # ← doc/spec-sync-check.md（アーカイブ時の仕様書同期チェック手順）
 ├── scripts/
 │   ├── dd-index-gen.sh       # ← templates/scripts/（INDEX全量再生成スクリプト）

@@ -13,7 +13,7 @@
 
 | ファイル | 説明 |
 |---------|------|
-| `doc/da-method.md` | DD + Devil's Advocate 開発方法論（品質フィルター・再チェック条件） |
+| `doc/da-method.md` | DA深掘り手法（参考文書 — 設計の岐路・レビュー指示時に使う） |
 | `doc/engineering-patterns.md` | エンジニアリングパターン集（gotcha・定石。DAの同根パターンの昇格先） |
 | `doc/decisions.md` | 意思決定記録（長寿命のアーキテクチャ決定。「なぜこうなってる？」の逆引き） |
 | `doc/templates/coding-standards.md` | コーディング基準書（P規約・採点基準・Lint対応表） |
@@ -40,7 +40,7 @@
 
 | ファイル | 説明 |
 |---------|------|
-| `doc/templates/dd_template.md` | DD標準テンプレート（DA批判レビュー組み込み済み） |
+| `doc/templates/dd_template.md` | DD標準テンプレート（受け入れ基準・リスク判定・完了前チェック） |
 | `doc/templates/dd_template_bugfix.md` | バグ修正DD用 差分テンプレート |
 | `doc/templates/dd_template_mock.md` | モック先行DD用 差分テンプレート |
 | `doc/templates/dd_template_e2e.md` | E2E駆動DD用 差分テンプレート |

@@ -7,7 +7,7 @@
 - `dd-index-gen.sh` — DD-INDEX.md の全量再生成（Bash 版・技術スタック非依存）
 - `dd-health.sh` — DD運用ヘルスチェック（クローズ漏れ・滞留・ログ形骸化・DA雛形残置・ステータス語彙lintの静的分析。`--dd DD-NNN` で単一DDの即時チェック）
 - `doc-check.sh` — DOC-MAP.md と doc/ 配下の整合性チェック（孤児ドキュメント・リンク切れ検出）
-- `codex-review.sh` — Codexレビュー自動実行（**任意**。サブスク認証のCodex CLI導入時のみ。別モデル視点で実装差分をレビューさせAPI課金なし。`--check` で利用可否判定・トークン消費なし）
+- `codex-review.sh` — Codexレビュー実行（**任意・ユーザー指示時のみ**。サブスク認証のCodex CLI導入時のみ。別モデル視点で実装差分をレビューさせAPI課金なし。`--check` で利用可否判定・トークン消費なし）
 - `dd-update.sh` — dd-know-how から配布物一式を取り込む（**Pull型更新の呼び出し口**。本体は dd-know-how 側の `tools/dd-update-core.sh` にあり、常に最新ロジックが実行される。コミットはしない）
 
 ## パス設定（.dd-config）
@@ -37,7 +37,7 @@ bash scripts/dd-update.sh                     # 取り込み（コミットは�
 
 `dd-index-gen.sh` は `/dd rebuild-index` からも呼び出される。DD-INDEX の「進行中」「保留・見送り」「完了済み」はヘッダ表のステータス（固定6種: 検討中/進行中/確認待ち/保留/見送り/完了）と配置から自動分類され、補足列（4列目）が「補足」「理由」「主な成果」に流用される。
 `doc-check.sh` は precheck（lint・テストと並ぶDD完了前の集約チェック）への組み込みを推奨。
-`codex-review.sh` は Codex CLI が使える環境でのみ有効（任意機能）。`/dd` の新規作成フローが `--check` で自動判定し、使えなければCodexレビュータスクを省く。詳細は `templates/guides.md` §Codexレビューゲート。
+`codex-review.sh` は Codex CLI が使える環境でのみ有効（任意機能）。**DDタスクには組み込まず、ユーザーが「Codexにレビューさせて」と指示した時のみ実行する**（運用: `templates/guides.md` §10、手順: `/dd` スキルの「レビュー依頼」節）。
 
 ---
 
