@@ -9,25 +9,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Changed
 - **v7: プロセス簡素化 — 脱・自動レビュー（レビューは人間が都度指示する方式へ）**
   - 背景: 起票→実行→Codex自動レビューの多段自動構成が、時間コストに見合う品質改善を生んでいなかった（利用先実測）。Opus 5 世代のモデルは工程を細かく縛るより「ゴール（受け入れ基準）＋制約（リスク・機械検証）」を固定して進め方を任せる方が結果が良い、という知見に合わせてプロセスを再設計
-  - `templates/dd_template.md`（111→63行）: Phase 0 の判定4点セット（軽量DD判定・実装前詳細化トリガー・Codexレビュー要否・DA調査）を廃止し、冒頭の「アプローチ1行＋リスク判定1行」に置換。Phaseごとの複製タスク（実装前詳細化・DA批判レビュー・Codex実行/対応）と「DA批判レビュー記録」セクションを削除し、**完了前チェック**（受け入れ基準照合・セルフレビュー1巡・全回帰1回）に集約
-  - `templates/guides.md`: §1.5 軽量DDパスを削除（軽量が既定になり判定自体が不要に）。§7 の Codexレビューゲート（要否判定・effort判定・Phase組み込み）を削除。**§10「リスク判定とレビュー運用」新設** — 実装は1モデル（Opus / Codex）で完走 → 完了報告 → 人間がリスク・規模を見て、もう一方のモデルへレビューを都度指示。§7 に「進め方は実装モデルに任せる（DDは作業手順書ではない）」を明文化。§3 ステータス語彙・§9 エビデンスは不変（節番号も維持）
+  - `templates/dd_template.md`（111→60行）: Phase 0 の判定4点セット（軽量DD判定・実装前詳細化トリガー・Codexレビュー要否・DA調査）を廃止し、冒頭の「アプローチ1行＋リスク判定1行」に置換。Phaseごとの複製タスク（実装前詳細化・DA批判レビュー・Codex実行/対応）と「DA批判レビュー記録」セクションを削除し、**完了前チェック**（受け入れ基準照合・セルフレビュー1巡・全回帰1回）に集約
+  - `templates/guides.md`（231→200行）: §1.5 軽量DDパスを削除（軽量が既定になり判定自体が不要に）。§7 の Codexレビューゲート（要否判定・effort判定・Phase組み込み）を削除。**§10「リスク判定とレビュー運用」新設** — 実装は1モデル（Opus / Codex）で完走 → 完了報告 → 人間がリスク・規模を見て、もう一方のモデルへレビューを都度指示。§7 に「進め方は実装モデルに任せる（DDは作業手順書ではない）」を明文化。§3 ステータス語彙・§9 エビデンスは不変（節番号も維持）
   - 差分テンプレ4種: DA・Codex 配線を除去。bugfix はサブエージェントレビューも除去し「同根パターンの横展開確認」を通常タスク化。e2e/tdd の「Phase 0 に追加」は「最初のPhaseとして追加」に変更（標準テンプレのPhase 0 廃止に追随）
   - `doc/da-method.md`: **参考文書に格下げ**（必須フローから除外）。深掘りが要る局面（設計の岐路・リスクありDD・レビュー指示時）の手法集として保持
   - `/dd` スキル: 新規作成フローから Codex 可否チェックを削除。アーカイブ時チェックリストを8→4項目に圧縮（仕様書同期と知見昇格は1項目に統合）。**「レビュー依頼（ユーザー指示時のみ — 自動実行しない）」節を新設**（`codex-review.sh` は手動ディスパッチの実行手段として残置）
   - `doc/development-flow.md`: Step 5 に**完了報告**（DD番号・変更ファイル・受け入れ基準の結果・リスク判定・残課題）と、レビューの手動ディスパッチ（人間が別モデルへ指示）を明記
   - README / IMPORT / DOC-MAP / examples / customization: v7 の運用（自動組み込み廃止の経緯を含む）に合わせて記述を更新
   - `dd-health.sh`: 検出ロジックは不変（v7テンプレDDでは DA関連チェックが自然に ℹ️ 扱いになる）。DA関連の文言のみ「旧テンプレ向け」と明示
-- **dd-auto スキル廃止**: 正本に未収載のまま一部利用先（minecraft_creator / nanairo-workspace / spreadjs）に存在した自動完走スキルは、v7 の運用（1モデルで完走＋人間が起票・レビューをゲート）と重複・矛盾するため、正本へ取り込まず廃止。削除手順は `doc/UPGRADE-NOTICE.md` v7 を参照
-
-### Security
-- **配布フック/スクリプトのガードレール堅牢化（v6）** — 利用先での自動セキュリティレビュー指摘3件＋補足への対応。ミラー（`.codex` / `.agents`）は正本と同一のため配布元 `templates/` 側で一括修正
-  - **`.dd-config` の `source` による任意コード実行を排除**（深刻度: 高）: 設定ファイルを `source` していた7か所（`post-bash-dd-archive-reminder.sh` / `dd-index-gen.sh` / `dd-health.sh` / `doc-check.sh` / `dd-update.sh` / `dd-update-core.sh` と、値未使用の `codex-review.sh`）を、`source` せず必要キーだけを厳格抽出する `dd_config_get()` に置換。値のホワイトリストは `[A-Za-z0-9 ._:/~-]`（Windows パスのコロンを含む）。`$( )` `;` `` ` `` 等を含む行は無視され実行されない。`.dd-config` は pre-edit-guard の保護対象にも追加
-  - **pre-edit-guard の Windows バイパスを修正**（深刻度: 中〜高）: 判定前にパスを正規化（バックスラッシュ→スラッシュ、重複スラッシュ・冗長 `./..` の畳み込み〔`tr -s` + `realpath -m`〕、小文字化）。従来は実 JSON のエスケープされたバックスラッシュ（`\\`）が `//` に化けて `.claude/settings.json` 保護を素通りし、`.CLAUDE`（大文字）や `./` 経由でもバイパスできた
-  - **ガード保護対象を「ガードレール一式」に一般化**（深刻度: 中）: 従来の `.claude/settings*.json` 2種に加え、フック本体（`.claude/hooks/*`）・Codex 系（`.codex/hooks.json` / `.codex/hooks/*`）・`.agents/hooks/*`・`.dd-config` を保護（フックを `exit 0` に書き換えてガードを無効化する経路を封鎖）。`dd-update-core.sh` のフック配布先にも `.codex/hooks` を追加
-  - **JSON パースの頑健化**: `file_path` 抽出を jq 優先・grep/sed フォールバックに。パス特定不可時はフェイルオープン（過剰ブロックによるロックアウト回避）で、シンボリックリンク別名と併せ残存リスクとして各ヘッダ／README に明記
-  - 回帰確認: ガード14ベクタ（バイパス6・保護8）と正常系、悪意ある `.dd-config` での全スクリプト実行でRCE不発かつパス読取り正常を実測
-
-### Changed
 - **DD運用の軽量化5点を正本テンプレ/方法論へ反映**（利用先 nanairo-workspace の DD-018 適用 → DD-019 実測「良好」を受けた上流反映。関連: nanairo DD-019 / DD-021）
   - `templates/guides.md`: §1.5 軽量DDパス新設 ／ §7 全回帰は「確認待ち」直前の1回のみ ／ 記録ダイエット（同一情報を2箇所に書かない・1判断1行）／ Codex生ログ破棄 ／ DA・Codex排他（同PhaseはCodex結果で代替）／ §8 確認ゲート統合（起票時＋受入の2回まで）
   - `templates/dd_template.md`: ⚖️軽量DD判定チェック ／ DA項目にCodex代替クローズ ／ 全回帰1回コメント
@@ -38,6 +27,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - 改変判定に `.dd-manifest`（前回配布時のハッシュ記録）を導入。未改変（=前回配布と一致）なら新版を自動採用、ローカル改変を検出したら上書きせず「⚠️ 手動確認」リスト（diff 手順つき）に回す。初回でマニフェストが無い場合は保守的に保護
   - `--adopt-content` フラグ: ローカル改変を無視して全面的に新版を採用（default配置で確実に最新化したいとき用）
   - 全分岐を実測確認（新規作成/一致no-op/未改変→採用/改変→保護/強制採用/冪等/コード層強制更新）
+- `templates/scripts/dd-index-gen.sh`: 「保留・見送り」セクションを自動生成（ステータス 保留/見送り を検出。従来は「自動検出不可」として常に空）。進行中セクションに補足列を追加。「主な成果」は補足列を優先し、無ければステータス欄（旧運用互換）。TS参考実装（`templates/scripts/README.md`）も同仕様に全面更新
+- `templates/scripts/dd-health.sh`: 「見送り」のままアクティブなDDもクローズ漏れ扱いに。ステータス語彙テーブルをアクティブDD限定 + 固定6種判定列付きに変更
+- `/setup` スキル: パス調整ステップを `.dd-config` 生成方式に変更（**scripts/・hooks/ 内のパス直書きを禁止**）。パス整合性チェックに `.dd-config` 検証と `dd-index-gen.sh` 実行テストを追加
+- `templates/guides.md`: §3「ステータスと補足列（固定語彙）」を挿入し旧§3以降を+1リナンバー（tdd/e2e テンプレの「§7」参照を「§8」へ追随）。フォルダ構成例をスクリプト既定値（`doc/archived/DD`）と一致させ、実配置は `.dd-config` が正であることを明記
+- `templates/scripts/dd-index-gen.sh`: 完了済みセクションの「主な成果」列にステータス欄を表示するよう変更（従来は `read` で status を捨て `printf` で空をハードコードしていたため常に空欄だった。完了時ステータスに成果要約を書く運用と組み合わせる）
+- 見落としチェック → DA批判レビューに名称・概念を変更
+  - テンプレート、実例、開発フロードキュメントを一括更新
 
 ### Added
 - **AGENTS.md 正本化 — Claude Code / Codex 両対応で二重管理を排除**
@@ -89,14 +85,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - 批判的視点での事前調査を促す
   - 代替案・リスク・失敗シナリオ・保守性を検討
 
-### Changed
-- `templates/scripts/dd-index-gen.sh`: 「保留・見送り」セクションを自動生成（ステータス 保留/見送り を検出。従来は「自動検出不可」として常に空）。進行中セクションに補足列を追加。「主な成果」は補足列を優先し、無ければステータス欄（旧運用互換）。TS参考実装（`templates/scripts/README.md`）も同仕様に全面更新
-- `templates/scripts/dd-health.sh`: 「見送り」のままアクティブなDDもクローズ漏れ扱いに。ステータス語彙テーブルをアクティブDD限定 + 固定6種判定列付きに変更
-- `/setup` スキル: パス調整ステップを `.dd-config` 生成方式に変更（**scripts/・hooks/ 内のパス直書きを禁止**）。パス整合性チェックに `.dd-config` 検証と `dd-index-gen.sh` 実行テストを追加
-- `templates/guides.md`: §3「ステータスと補足列（固定語彙）」を挿入し旧§3以降を+1リナンバー（tdd/e2e テンプレの「§7」参照を「§8」へ追随）。フォルダ構成例をスクリプト既定値（`doc/archived/DD`）と一致させ、実配置は `.dd-config` が正であることを明記
-- `templates/scripts/dd-index-gen.sh`: 完了済みセクションの「主な成果」列にステータス欄を表示するよう変更（従来は `read` で status を捨て `printf` で空をハードコードしていたため常に空欄だった。完了時ステータスに成果要約を書く運用と組み合わせる）
-- 見落としチェック → DA批判レビューに名称・概念を変更
-  - テンプレート、実例、開発フロードキュメントを一括更新
+### Removed
+- **dd-auto スキル廃止**: 正本に未収載のまま一部利用先（minecraft_creator / nanairo-workspace / spreadjs）に存在した自動完走スキル（起票=Fable → 実装=Opus → Codexレビューをサブエージェントへ自動振り分け）は、v7 の運用（1モデルで完走＋人間がレビューを都度ゲート）と矛盾するため、正本へ取り込まず廃止。スキル本体に加え `.claude/agents/dd-drafter.md` / `dd-implementer.md` も削除対象。手順は `doc/UPGRADE-NOTICE.md` v7 を参照
 
 ### Fixed
 - `templates/scripts/dd-index-gen.sh`: アーカイブ判定が固定正規表現 `archived/` だったため、`doc/DD/archive/` 等の配置でアーカイブ済みDDが「進行中」に混入する問題（ARCHIVE_DIR 前方一致 + `archived?/` で判定）
@@ -109,6 +99,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - グロブ `DD-*.md` が `DD-INDEX.md` 自身をマッチし「DD-INDEX」エントリが出力に混入する問題（ファイル収集時に basename で除外）
   - アーカイブ0件時に grep パイプラインが `pipefail` + `set -e` で非ゼロ終了する問題（`|| true` ガード）
   - レポート行 `archived=0` の表示に改行混入で `0\n0` になる問題（`|| echo 0` → `|| true`）
+
+### Security
+- **配布フック/スクリプトのガードレール堅牢化（v6）** — 利用先での自動セキュリティレビュー指摘3件＋補足への対応。ミラー（`.codex` / `.agents`）は正本と同一のため配布元 `templates/` 側で一括修正
+  - **`.dd-config` の `source` による任意コード実行を排除**（深刻度: 高）: 設定ファイルを `source` していた7か所（`post-bash-dd-archive-reminder.sh` / `dd-index-gen.sh` / `dd-health.sh` / `doc-check.sh` / `dd-update.sh` / `dd-update-core.sh` と、値未使用の `codex-review.sh`）を、`source` せず必要キーだけを厳格抽出する `dd_config_get()` に置換。値のホワイトリストは `[A-Za-z0-9 ._:/~-]`（Windows パスのコロンを含む）。`$( )` `;` `` ` `` 等を含む行は無視され実行されない。`.dd-config` は pre-edit-guard の保護対象にも追加
+  - **pre-edit-guard の Windows バイパスを修正**（深刻度: 中〜高）: 判定前にパスを正規化（バックスラッシュ→スラッシュ、重複スラッシュ・冗長 `./..` の畳み込み〔`tr -s` + `realpath -m`〕、小文字化）。従来は実 JSON のエスケープされたバックスラッシュ（`\\`）が `//` に化けて `.claude/settings.json` 保護を素通りし、`.CLAUDE`（大文字）や `./` 経由でもバイパスできた
+  - **ガード保護対象を「ガードレール一式」に一般化**（深刻度: 中）: 従来の `.claude/settings*.json` 2種に加え、フック本体（`.claude/hooks/*`）・Codex 系（`.codex/hooks.json` / `.codex/hooks/*`）・`.agents/hooks/*`・`.dd-config` を保護（フックを `exit 0` に書き換えてガードを無効化する経路を封鎖）。`dd-update-core.sh` のフック配布先にも `.codex/hooks` を追加
+  - **JSON パースの頑健化**: `file_path` 抽出を jq 優先・grep/sed フォールバックに。パス特定不可時はフェイルオープン（過剰ブロックによるロックアウト回避）で、シンボリックリンク別名と併せ残存リスクとして各ヘッダ／README に明記
+  - 回帰確認: ガード14ベクタ（バイパス6・保護8）と正常系、悪意ある `.dd-config` での全スクリプト実行でRCE不発かつパス読取り正常を実測
 
 ## [1.0.0] - 2025-01-24
 
