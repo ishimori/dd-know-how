@@ -76,19 +76,22 @@ if [ ! -d "$DD_DIR" ]; then
 fi
 
 # --- Collect DD files ---
-# NOTE: glob `DD-*.md` は DD-INDEX.md 自身もマッチするため明示的に除外する。
+# 識別子付きDD（DDK-001 / DDI-001 等。複数人・並行セッション運用）を拾うため
+# glob は `DD-*` ではなく `DD*-*` を使い、dd-health.sh と同じ `^DD[A-Z]*-[0-9]`
+# 判定で絞る（DD-INDEX.md や番号を持たないファイルはこの判定で除外される）。
+# ソートキー（下方の `^DD[A-Z]*-` 除去）はもともと接頭辞対応済みで、収集だけが未対応だった。
 DD_FILES=()
-for f in "$DD_DIR"/DD-*.md; do
+for f in "$DD_DIR"/DD*-*.md; do
     [ -f "$f" ] || continue
-    [ "$(basename "$f")" = "DD-INDEX.md" ] && continue
+    [[ "${f##*/}" =~ ^DD[A-Z]*-[0-9] ]] || continue   # basename は fork するため ${f##*/} を使う
     DD_FILES+=("$f")
 done
 
 ARCHIVE_FILES=()
 if [ -d "$ARCHIVE_DIR" ]; then
-    for f in "$ARCHIVE_DIR"/DD-*.md; do
+    for f in "$ARCHIVE_DIR"/DD*-*.md; do
         [ -f "$f" ] || continue
-        [ "$(basename "$f")" = "DD-INDEX.md" ] && continue
+        [[ "${f##*/}" =~ ^DD[A-Z]*-[0-9] ]] || continue
         ARCHIVE_FILES+=("$f")
     done
 fi

@@ -29,6 +29,7 @@ bash scripts/doc-check.sh --doc-dir doc
 bash scripts/dd-health.sh                     # 全体レポート（Markdown を stdout に出力）
 bash scripts/dd-health.sh --dd DD-042 --new   # 作成直後のセルフチェック（DA雛形は正常扱い）
 bash scripts/dd-health.sh --dd DD-042         # アーカイブ前チェック（ログ・DA記入も見る）
+bash scripts/dd-health.sh --dd DDK-001        # 識別子付きDD（複数人・並行セッション運用）も指定可
 bash scripts/dd-health.sh --strict            # ⚠️があれば終了コード1（precheck組み込み用）
 
 bash scripts/dd-update.sh --dry-run           # dd-know-how からの更新内容を事前確認
@@ -156,10 +157,12 @@ if (!existsSync(ddDir)) {
 }
 
 // --- Collect DD files ---
+// 識別子付きDD（DDK-001 等）も拾う。.sh 版の glob `DD*-*.md` + `^DD[A-Z]*-[0-9]` 判定と
+// 同一条件（DD-INDEX.md や番号を持たないファイルはこの判定で除外される）
 const collectDdFiles = (dir: string): string[] => {
   if (!existsSync(dir)) return []
   return readdirSync(dir)
-    .filter((f) => f.startsWith('DD-') && f.endsWith('.md') && f !== 'DD-INDEX.md')
+    .filter((f) => /^DD[A-Z]*-[0-9]/.test(f) && f.endsWith('.md'))
     .map((f) => join(dir, f))
 }
 

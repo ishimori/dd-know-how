@@ -16,6 +16,7 @@
 # 単一DDの即時チェック（作成直後・アーカイブ前のセルフチェック）:
 #   bash scripts/dd-health.sh --dd DD-042          # アーカイブ前チェック（DA・ログも見る）
 #   bash scripts/dd-health.sh --dd DD-042 --new    # 作成直後チェック（DA雛形は正常扱い）
+#   bash scripts/dd-health.sh --dd DDK-001         # 識別子付きDD（複数人・並行セッション運用）も指定可
 #
 # 検出項目:
 #   - クローズ漏れ（完了ステータスなのに未アーカイブ）
@@ -201,21 +202,42 @@ END { emit() }
 # =============================================================================
 if [ -n "$TARGET_DD" ]; then
     raw="$TARGET_DD"
-    raw="${raw#DD-}"; raw="${raw#dd-}"; raw="${raw#DD}"
+    # 接頭辞（DD / dd）・識別子（DDK の K、DDSA の SA 等）・ハイフンを分解する。
+    # 識別子は捨てない — DD-001 と DDK-001 が併存すると `DD*-001` が両方にマッチし、
+    # 辞書順で誤った方を拾うため。
+    # 例: DD-042 → ident="" num=042 / DDK-001 → ident=K num=001 / DD-001-1 → ident="" num=001-1
+    ident=""
+    if [[ "$raw" =~ ^[Dd][Dd]([A-Za-z]*)-?(.+)$ ]]; then
+        ident="${BASH_REMATCH[1]}"; raw="${BASH_REMATCH[2]}"
+    fi
+    # ファイル名の識別子は大文字（収集時の ^DD[A-Z]*- 判定と同じ）。glob は大小を
+    # 区別するため、小文字入力（ddk-001 等）はここで正規化する。
+    [ -n "$ident" ] && ident=$(printf '%s' "$ident" | tr '[:lower:]' '[:upper:]')
     pad="$raw"
     [[ "$raw" =~ ^[0-9]+$ ]] && pad=$(printf "%03d" "$((10#$raw))")
+
+    # 識別子が明示されていればそれに限定。無指定なら素のDDを優先し、無ければ識別子付きへ広げる。
+    # パターンは文字列のまま保持する（ここで展開させない）。展開は下の `"$d"/$p` で行う。
+    if [ -n "$ident" ]; then
+        PATTERNS=("DD${ident}-${pad}_*.md" "DD${ident}-${pad}.md" "DD${ident}-${raw}_*.md" "DD${ident}-${raw}.md")
+    else
+        PATTERNS=("DD-${pad}_*.md" "DD-${pad}.md" "DD-${raw}_*.md" "DD-${raw}.md"
+                  "DD*-${pad}_*.md" "DD*-${pad}.md" "DD*-${raw}_*.md" "DD*-${raw}.md")
+    fi
 
     FILE=""
     IS_ACTIVE=1
     for d in "$DD_DIR" "$ARCHIVE_DIR"; do
         [ -d "$d" ] || continue
-        for cand in "$d"/DD*-"$pad"_*.md "$d"/DD*-"$pad".md "$d"/DD*-"$raw"_*.md "$d"/DD*-"$raw".md; do
-            if [ -f "$cand" ]; then FILE="$cand"; break 2; fi
+        for p in "${PATTERNS[@]}"; do
+            for cand in "$d"/$p; do
+                if [ -f "$cand" ]; then FILE="$cand"; break 3; fi
+            done
         done
         IS_ACTIVE=0
     done
     if [ -z "$FILE" ]; then
-        echo "ERROR: DD-$pad が見つかりません（$DD_DIR / $ARCHIVE_DIR）" >&2
+        echo "ERROR: $TARGET_DD が見つかりません（$DD_DIR / $ARCHIVE_DIR）" >&2
         exit 1
     fi
 

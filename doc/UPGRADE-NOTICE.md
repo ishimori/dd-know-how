@@ -47,8 +47,9 @@ DDの自動完走は「1モデルにDD単位で実行を指示する」通常運
 **3. 差分を確認してコミット**
 
 ```bash
-git diff --stat
-git add -A && git commit -m "chore: DDプロセスをv7に簡素化（脱・自動レビュー）"
+git status --short   # 変更が配布物（scripts/ hooks skills テンプレ .dd-manifest）だけであることを確認
+git add <上で確認した変更ファイル>   # 対象を明示して stage（git add -A は無関係の変更・秘匿ファイルを巻き込むため使わない）
+git commit -m "chore: DDプロセスをv7に簡素化（脱・自動レビュー）"
 ```
 
 **4. 🔬 検証**
@@ -96,7 +97,8 @@ bash scripts/dd-update.sh
 
 ```bash
 git diff        # 変更内容を確認
-git add -A && git commit -m "chore: DDガードレールをv6にセキュリティ更新"
+git add <変更のあった配布物ファイル>   # 対象を明示して stage（git add -A は使わない）
+git commit -m "chore: DDガードレールをv6にセキュリティ更新"
 ```
 
 ### 変更点の注意

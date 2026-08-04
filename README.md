@@ -313,7 +313,7 @@ dd-know-how/
 
 ## カスタマイズ・運用
 
-- 複数人運用: `DDI-001`（石森）`DDSA-001`（斉藤）のような識別子プレフィックスで番号衝突を防止
+- 複数人・並行セッション運用: `DDI-001`（人ごと）`DDK-001`（作業系列ごと）のような識別子プレフィックスで番号衝突を防止 — [運用ガイド](doc/customization/parallel-sessions.md)
 - [テンプレートのカスタマイズ](doc/customization/template-sections.md) / [開発フローのバリエーション](doc/customization/development-flow-variants.md) / [他のAI環境での使用](doc/customization/other-environments.md)
 - 既存導入プロジェクトの更新: [doc/UPGRADE-NOTICE.md](doc/UPGRADE-NOTICE.md)
 

@@ -10,6 +10,7 @@ DDノウハウをプロジェクトに合わせて調整するためのガイド
 | 開発フローのステップ数 | 3, 5, 7, 9ステップから選択 | [development-flow-variants.md](development-flow-variants.md) |
 | フォルダパス | `doc/DD/` 以外のパスを使用 | 本ファイル参照 |
 | コマンド名 | `/dd` 以外のコマンド名を使用 | 本ファイル参照 |
+| 並行セッション・複数人運用 | 識別子付きDD（`DDK-001` 等）で系列を分ける | [parallel-sessions.md](parallel-sessions.md) |
 | 他の環境での使用 | Claude Code / Codex 以外のAI/手動運用 | [other-environments.md](other-environments.md) |
 
 ## フォルダパスのカスタマイズ
@@ -189,4 +190,5 @@ DDに「リスク」セクションを追加：
 
 - [template-sections.md](template-sections.md) - テンプレートのセクション追加例
 - [development-flow-variants.md](development-flow-variants.md) - 開発フローのステップ数調整
+- [parallel-sessions.md](parallel-sessions.md) - 並行セッション・複数人でのDD運用（識別子付きDD）
 - [other-environments.md](other-environments.md) - Claude Code / Codex 以外の環境での使用方法
