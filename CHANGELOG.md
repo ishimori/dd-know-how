@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Fixed
+- **`/dd` スキルの新規作成手順が、導入先に存在しないパスを指していた**（利用先3リポで実測確認）
+  - `IMPORT.md` はテンプレートを `doc/templates/` へ配置させる（`cp dd-know-how/templates/*.md doc/templates/`）のに、配布される `SKILL.md` は `templates/guides.md` / `templates/dd_template.md` を Read せよと書いていた。このパスが存在するのは dd-know-how 自身だけで、**導入先では必ず Read に失敗する**（同スキルは「Read に失敗したらエラーとして停止」と定めているため、DD新規作成が止まる）
+  - 導入先の実態に合わせて `doc/templates/...` へ修正。利用先の1リポは既に同じ内容へローカル改変しており、その手当てを上流へ還元した形
+  - あわせて §インデックス再構築・§ヘルスチェックの「スクリプトが無い場合のコピー元」を `dd-know-how の templates/scripts/...` と明示（配布先のパスと読み違えないように）
+
 ### Changed
 - **`doc-check.sh` の fork 除去 — 完了ゲートとして使える速度に戻した**（利用先実測: 87ファイルで50秒 / 1300ファイルで20分規模 → **2.2秒**。出力は旧版とバイト単位で一致し、孤児・リンク切れ・終了コードも同一であることを新旧比較で確認）
   - 原因は Windows + Git Bash の fork コスト（**実測 約0.3秒/回**）。ファイル1件ごとに `grep -qF` を2〜3回と `dirname` を呼んでいたため、件数に比例して分〜十分規模まで悪化していた。`dd-index-gen.sh` が先に解決した問題（`$(basename)` の除去）と同根

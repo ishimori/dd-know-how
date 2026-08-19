@@ -69,8 +69,8 @@ ls {DDフォルダ}/ | grep DD-{番号}
 
 ### 新規作成
 
-1. **`templates/guides.md` を Read** → アプローチと使用するテンプレートを決定
-2. **`templates/dd_template.md`（+ 差分テンプレート）を Read** → DD骨格を取得
+1. **`doc/templates/guides.md` を Read** → アプローチと使用するテンプレートを決定
+2. **`doc/templates/dd_template.md`（+ 差分テンプレート）を Read** → DD骨格を取得
 3. `{DDフォルダ}/DD-INDEX.md` が存在すればINDEXから最大番号を取得。存在しなければファイルスキャン（`ls`）で取得。識別子付き系列（`DDK-` 等）で作る場合は**その系列内の最大番号**から連番を取る
 4. 次の連番でファイル作成: `DD-{連番}_{タイトル}.md`
 5. テンプレートの `{番号}` `{タイトル}` `{日付}` を置換し、アプローチとリスク判定（guides.md §10）を冒頭に1行ずつ記載して作成。ステータスは初期値「検討中」のまま — 固定語彙6種（guides.md §3）以外を書かない
@@ -101,7 +101,7 @@ ls {DDフォルダ}/ | grep DD-{番号}
 
 ### インデックス再構築
 
-`bash scripts/dd-index-gen.sh` を実行して DD-INDEX.md を全量再生成する。スクリプトが存在しない場合はユーザーに `templates/scripts/dd-index-gen.sh` のコピーを提案する。
+`bash scripts/dd-index-gen.sh` を実行して DD-INDEX.md を全量再生成する。スクリプトが存在しない場合はユーザーに dd-know-how の `templates/scripts/dd-index-gen.sh` のコピーを提案する。
 
 ### ヘルスチェック（運用分析）
 
@@ -109,7 +109,7 @@ DD運用が期待通り回っているか（クローズ漏れ・滞留・ログ
 
 1. `bash scripts/dd-health.sh` を実行してレポートを取得（単一DDは `--dd DD-{番号}`）
 2. レポートをそのまま貼らず、「要対応」の各DDに推奨アクション（アーカイブ / 再開・見送りの判断 / ログ補完）を添えて提示する。判断に迷う項目は該当DDを開いて根拠を確認してから提案する
-3. スクリプトが存在しない場合は `templates/scripts/dd-health.sh` のコピーを提案する
+3. スクリプトが存在しない場合は dd-know-how の `templates/scripts/dd-health.sh` のコピーを提案する
 
 ### レビュー依頼（ユーザー指示時のみ — 自動実行しない）
 
