@@ -16,8 +16,15 @@
 # 本スクリプトは全プロジェクト共通の配布物 — 直接編集しないこと。
 #
 # 終了コード: 0=整合 / 1=ERRORあり（precheck・CI に組み込める）
-# 注意: Windows + Git Bash ではファイル数百件規模で fork コストにより遅くなる
-#       可能性がある（scripts/README.md の dd-index-gen.sh の項を参照）。
+#
+# ⚠️ 改修時の注意 — ループの中で外部コマンドを呼ばないこと。
+#    Windows + Git Bash では fork 1回あたり実測 約0.3秒かかる。ファイル1件ごとに
+#    grep/dirname を呼ぶ実装では数百件で分〜十分規模になり、完了ゲートとして
+#    使えなくなる（実測: 1300件で20分規模）。本スクリプトは
+#      - ファイル列挙 = git ls-files（.gitignore を尊重＝node_modules 等を除外）
+#      - DOC-MAP は一度だけ読み、以後は bash の文字列マッチ（[[ ]] は builtin）
+#      - dirname/basename ではなくパラメータ展開（${x%/*}）
+#    で fork をほぼゼロにしている。同じ結果でも grep を1つ足すと桁で遅くなる。
 # =============================================================================
 set -euo pipefail
 
@@ -60,47 +67,64 @@ fi
 
 errors=0
 
+# DOC-MAP は一度だけ読む。以後の照合は builtin の文字列マッチで行う（fork なし）。
+MAP_CONTENT="$(cat "$MAP_FILE")"
+
 # =============================================================================
 # チェック1: 孤児ドキュメント検出
 # =============================================================================
+# ファイル列挙: git 管理下＋未追跡（.gitignore 除外）。git 管理外なら find へ退避。
+# git ls-files が .gitignore を尊重するため、node_modules 等の依存物は入らない。
+list_docs() {
+    if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+        git -c core.quotepath=false ls-files --cached --others --exclude-standard -- "$DOC_DIR/*.md" | sort
+    else
+        find "$DOC_DIR" -name '*.md' -type f | sort
+    fi
+}
+
 while IFS= read -r f; do
+    [ -n "$f" ] || continue
     rel="${f#./}"
     case "$rel" in
         "$MAP_FILE")                              continue ;;  # DOC-MAP 自身
         "$DOC_DIR"/DD/*|"$DOC_DIR"/archived/*)    continue ;;  # DD-INDEX が索引
+        */node_modules/*)                         continue ;;  # 依存物（gitignore漏れ保険）
     esac
 
     # 直接参照（ファイルパスが DOC-MAP に登場するか）
-    if grep -qF "$rel" "$MAP_FILE"; then
-        continue
-    fi
+    [[ "$MAP_CONTENT" == *"$rel"* ]] && continue
 
     # 間接参照（親フォルダがフォルダ単位で参照されているか。例: `doc/spec/`）
     reachable=0
-    dir=$(dirname "$rel")
+    if [[ "$rel" == */* ]]; then dir="${rel%/*}"; else dir="."; fi
     while [ "$dir" != "$DOC_DIR" ] && [ "$dir" != "." ] && [ "$dir" != "/" ]; do
-        if grep -qF "$dir/" "$MAP_FILE"; then
+        if [[ "$MAP_CONTENT" == *"$dir/"* ]]; then
             reachable=1
             break
         fi
-        dir=$(dirname "$dir")
+        if [[ "$dir" == */* ]]; then dir="${dir%/*}"; else dir="."; fi
     done
 
     if [ "$reachable" -eq 0 ]; then
         echo "ERROR [孤児]: $rel が DOC-MAP.md から辿れない（行を追加するか、フォルダ単位の参照に含める）"
         errors=$((errors + 1))
     fi
-done < <(find "$DOC_DIR" -name '*.md' -type f | sort)
+done < <(list_docs)
 
 # =============================================================================
 # チェック2: DOC-MAP 内のリンク切れ検出
 # =============================================================================
+# 行ごとの grep -oE をやめ、bash の正規表現で左から順に抜き出す（抽出規則は同一）。
 while IFS= read -r line; do
     case "$line" in
         *未作成*) continue ;;  # 「未作成」と明記された行は将来予定としてスキップ
     esac
-    while IFS= read -r ref; do
-        [ -z "$ref" ] && continue
+    rest="$line"
+    while [[ "$rest" =~ ($DOC_DIR/[A-Za-z0-9_./-]+) ]]; do
+        ref="${BASH_REMATCH[1]}"
+        rest="${rest#*"$ref"}"
+        [ -n "$ref" ] || continue
         case "$ref" in
             *'{'*|*'}'*) continue ;;  # プレースホルダ
         esac
@@ -108,8 +132,8 @@ while IFS= read -r line; do
             echo "ERROR [リンク切れ]: DOC-MAP.md が参照する $ref が存在しない"
             errors=$((errors + 1))
         fi
-    done < <(printf '%s\n' "$line" | grep -oE "${DOC_DIR}/[A-Za-z0-9_./-]+" || true)
-done < "$MAP_FILE"
+    done
+done <<< "$MAP_CONTENT"
 
 # =============================================================================
 # 結果

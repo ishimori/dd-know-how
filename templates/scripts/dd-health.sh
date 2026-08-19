@@ -243,7 +243,7 @@ if [ -n "$TARGET_DD" ]; then
 
     RC=0
     extract "single" "$FILE" | awk -F'\t' \
-        -v today="$TODAY_MONO" -v fname="$(basename "$FILE")" -v is_active="$IS_ACTIVE" -v newmode="$NEW_MODE" '
+        -v today="$TODAY_MONO" -v fname="${FILE##*/}" -v is_active="$IS_ACTIVE" -v newmode="$NEW_MODE" '
 function mono(d,    a) { if (split(d, a, "-") != 3) return -1; return a[1]*372 + a[2]*31 + a[3] }
 function vocab_ok(s) { return (s == "検討中" || s == "進行中" || s == "確認待ち" || s == "保留" || s == "見送り" || s == "完了") }
 {
@@ -368,9 +368,9 @@ echo "> ステータスは固定6種（検討中/進行中/確認待ち/保留/�
 # --- DD-INDEX.md の鮮度（アクティブDDより古ければ再生成を促す） ---
 if [ -f "$DD_DIR/DD-INDEX.md" ] && [ ${#DD_FILES[@]} -gt 0 ]; then
     newest=$(ls -t -- "${DD_FILES[@]}" "$DD_DIR/DD-INDEX.md" | head -1)
-    if [ "$(basename "$newest")" != "DD-INDEX.md" ]; then
+    if [ "${newest##*/}" != "DD-INDEX.md" ]; then
         echo ""
-        echo "⚠️ DD-INDEX.md より新しいDDファイルがあります（$(basename "$newest")）→ \`bash scripts/dd-index-gen.sh\` で再生成を推奨"
+        echo "⚠️ DD-INDEX.md より新しいDDファイルがあります（${newest##*/}）→ \`bash scripts/dd-index-gen.sh\` で再生成を推奨"
     fi
 fi
 
