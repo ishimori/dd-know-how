@@ -291,7 +291,7 @@ trap 'rm -f "$TSV"' EXIT
     if [ ${#ARCHIVE_FILES[@]} -gt 0 ]; then extract "archived" "${ARCHIVE_FILES[@]}"; fi
 } > "$TSV"
 
-echo "# DDヘルスレポート（$TODAY）"
+echo "# DDヘルスレポート（${TODAY}）"
 echo ""
 echo "対象: \`$DD_DIR\`（アクティブ ${#DD_FILES[@]}件） / \`$ARCHIVE_DIR\`（アーカイブ ${#ARCHIVE_FILES[@]}件）"
 echo ""

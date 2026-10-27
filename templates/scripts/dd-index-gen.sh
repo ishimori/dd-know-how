@@ -152,7 +152,17 @@ trap 'rm -f "$ENTRIES_TMP"' EXIT
 # 出す。DD側とアーカイブ側を別々に head すると、片側が1件のときヘッダーが出ず
 # そのファイルが索引から漏れる（実測: アーカイブ1件が archived=0 になる）。
 # 必ず1回の呼び出しにまとめる（合計1件のケースは後段のフォールバックが処理）。
-head -12 "${DD_FILES[@]}" "${ARCHIVE_FILES[@]}" 2>/dev/null | awk -v ad="$ARCHIVE_DIR" '
+# Bash 3.2 + `set -u` では空配列の `"${array[@]}"` 展開が unbound variable になる。
+# アーカイブ0件の場合は空配列をコマンド引数へ展開しない。
+{
+    if [ "${#DD_FILES[@]}" -gt 0 ] && [ "${#ARCHIVE_FILES[@]}" -gt 0 ]; then
+        head -12 "${DD_FILES[@]}" "${ARCHIVE_FILES[@]}" 2>/dev/null
+    elif [ "${#DD_FILES[@]}" -gt 0 ]; then
+        head -12 "${DD_FILES[@]}" 2>/dev/null
+    else
+        head -12 "${ARCHIVE_FILES[@]}" 2>/dev/null
+    fi
+} | awk -v ad="$ARCHIVE_DIR" '
 # head -12 の出力を解析
 # 単一ファイルの場合 "==> ... <==" ヘッダーが出ないため、事前に判定が必要
 # → 呼び出し元で head に複数ファイルを渡すか、1ファイルでもヘッダーを出すようにする
