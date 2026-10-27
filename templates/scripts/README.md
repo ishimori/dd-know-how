@@ -8,7 +8,7 @@
 - `dd-health.sh` — DD運用ヘルスチェック（クローズ漏れ・滞留・ログ形骸化・DA雛形残置・ステータス語彙lintの静的分析。`--dd DD-NNN` で単一DDの即時チェック）
 - `doc-check.sh` — DOC-MAP.md と doc/ 配下の整合性チェック（孤児ドキュメント・リンク切れ検出）
 - `codex-review.sh` — Codexレビュー実行（**任意・ユーザー指示時のみ**。サブスク認証のCodex CLI導入時のみ。別モデル視点で実装差分をレビューさせAPI課金なし。`--check` で利用可否判定・トークン消費なし）
-- `dd-update.sh` — dd-know-how から配布物一式を取り込む（**Pull型更新の呼び出し口**。本体は dd-know-how 側の `tools/dd-update-core.sh` にあり、常に最新ロジックが実行される。コミットはしない）
+- `dd-update.sh` — dd-know-how の配布物との**差分レポート**（読み取り専用。本体は dd-know-how 側の `tools/dd-update-core.sh`）。改行コードの違いを無視して「上流だけ変更／両方変更／ローカルだけ変更／未導入／同一」に仕分け、diff を出す。取り込みはレポートを見て1ファイルずつ手で行う
 
 ## パス設定（.dd-config）
 
@@ -32,8 +32,7 @@ bash scripts/dd-health.sh --dd DD-042         # アーカイブ前チェック�
 bash scripts/dd-health.sh --dd DDK-001        # 識別子付きDD（複数人・並行セッション運用）も指定可
 bash scripts/dd-health.sh --strict            # ⚠️があれば終了コード1（precheck組み込み用）
 
-bash scripts/dd-update.sh --dry-run           # dd-know-how からの更新内容を事前確認
-bash scripts/dd-update.sh                     # 取り込み（コミットはしない。diff を確認して自分でコミット）
+bash scripts/dd-update.sh                     # dd-know-how との差分レポート（ファイルは変更しない）
 ```
 
 `dd-index-gen.sh` は `/dd rebuild-index` からも呼び出される。DD-INDEX の「進行中」「保留・見送り」「完了済み」はヘッダ表のステータス（固定6種: 検討中/進行中/確認待ち/保留/見送り/完了）と配置から自動分類され、補足列（4列目）が「補足」「理由」「主な成果」に流用される。
@@ -73,7 +72,7 @@ bash scripts/dd-update.sh                     # 取り込み（コミットは�
 - **床は低いほどよい。** DD運用の前提は git ＋ POSIX シェルだけ。ここに Node や Python を足すと、その言語を使わないプロジェクト（Python / Go / Terraform / 文書のみのリポ）にまで実行環境を要求することになる
 - **二重正本を作らない。** bash 版と別言語版を両方配ると検査ロジックの正本が2つになり、片方だけ直った状態が**静かに**発生する。検査スクリプトのバグは「✓ OK」という顔で出るため気づけない
 
-そのうえで、**実行環境があるプロジェクトが自分の言語で拡張を書くのは推奨する**。配布物を置き換えるのではなく、**隣に置く**（配布物の `doc-check.sh` はいつでも呼べる状態で残し、`docs:check:legacy` のような退避口を用意する）。こうすれば `dd-update.sh` の上書きと衝突せず、拡張が壊れても床に戻れる。
+そのうえで、**実行環境があるプロジェクトが自分の言語で拡張を書くのは推奨する**。配布物を置き換えるのではなく、**隣に置く**（配布物の `doc-check.sh` はいつでも呼べる状態で残し、`docs:check:legacy` のような退避口を用意する）。こうすれば上流版の取り込みと衝突せず、拡張が壊れても床に戻れる。
 
 ### 拡張として効く検査（言語非依存の設計知）
 

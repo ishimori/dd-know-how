@@ -104,7 +104,7 @@ description: DD設計書セットアップコマンド
 │   ├── dd-index-gen.sh       # ← templates/scripts/（INDEX全量再生成スクリプト）
 │   ├── dd-health.sh          # ← templates/scripts/（DD運用ヘルスチェック: 滞留・クローズ漏れ・形骸化検出）
 │   ├── doc-check.sh          # ← templates/scripts/（DOC-MAP整合性チェック: 孤児・リンク切れ検出）
-│   └── dd-update.sh          # ← templates/scripts/（Pull型更新の呼び出し口。本体は dd-know-how 側）
+│   └── dd-update.sh          # ← templates/scripts/（dd-know-how との差分レポート。読み取り専用・本体は dd-know-how 側）
 ├── .dd-config                # ← templates/dd-config.example から生成（ステップ8: 機械向けパス設定の単一ソース）
 ├── AGENTS.md                 # ← templates/AGENTS.md.snippet をベースに作成（指示ファイルの正本。ステップ6）
 └── CLAUDE.md                 # ← templates/CLAUDE.md.snippet（@AGENTS.md ポインタ。ステップ6）
@@ -291,7 +291,7 @@ Lintエラーを「P規約ID + 修正方針」付きでLLMに返し、自己修�
 4. development-flow.md で開発フローを確認
 5. フロントエンド実装を含む場合: Modern Web Guidance の利用を検討
    （coding-standards.md「補完ツール」セクション参照。npx で直接利用可能）
-6. 以後の更新はこのプロジェクト側から `bash scripts/dd-update.sh` で取り込めます（Pull型）
+6. dd-know-how の更新を取り込むときは、`bash scripts/dd-update.sh` で差分を確認し、必要なファイルだけを1つずつ取り込みます（スクリプトはファイルを変更しない）
 ```
 
 ## パス規約（推奨）

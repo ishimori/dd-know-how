@@ -117,7 +117,7 @@ your-project/
 ├── .agents/
 │   └── skills/
 │       └── dd/
-│           └── SKILL.md           # 同一内容の Codex 用ミラー（dd-update が両方を更新）
+│           └── SKILL.md           # 同一内容の Codex 用ミラー（取り込むときは両方を同じ内容にする）
 ├── doc/
 │   ├── DOC-MAP.md                 # ドキュメントインデックス（追加・移動時に更新）
 │   ├── DD/                        # DD設計書（進行中）

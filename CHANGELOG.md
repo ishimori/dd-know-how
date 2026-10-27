@@ -13,6 +13,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - あわせて §インデックス再構築・§ヘルスチェックの「スクリプトが無い場合のコピー元」を `dd-know-how の templates/scripts/...` と明示（配布先のパスと読み違えないように）
 
 ### Changed
+- **v8: dd-update を差分レポート専用に — 一括取り込みを廃止**（`tools/dd-update-core.sh` 全面改訂）
+  - 背景: 導入先で `dd-update.sh` を回して一括で取り込む運用は、導入以来一度も行われなかった。安定稼働中のリポジトリへ確認なしで配布物を流し込むのはリスクが大きく、実際の配布はすべて1リポジトリずつ差分を見て行われた。その過程で、上書きすると壊れるもの（パス調整・独自方針・独自構成・スクリプトへのローカル修正）が見つかっている
+  - 旧版の欠陥（利用先で実測確認）: scripts / hooks は無条件上書きで、スクリプトに入っていたローカル修正を警告なしで消す作りだった。改変判定（`.dd-manifest`）は `core.autocrlf=true` のリポジトリで改行コードだけの差をローカル改変と誤検出し、本物の改変と同じ一覧で `--adopt-content`（全面上書き）を案内していた。配布元は dd-know-how の作業ツリーそのもので、未コミットの編集途中のファイルも配られた
+  - 新しい動作: ファイルを一切変更しない。改行コードの違いを無視して比べ、ファイルごとに「上流だけ変更／両方変更／ローカルだけ変更／未導入／同一」に仕分けて diff と、その後の上流コミットを表示する。「両方変更」は「反映すべき上流の変更」と「残すべき導入先の改変」を分けて出す。取り込みはレポートの `cp` を使って1ファイルずつ手で行う
+  - 比較の基準は dd-know-how のコミット済みの内容（HEAD）。作業ツリーに未コミット変更があれば警告し、そのファイルには `cp` の案内を出さない。main 以外のブランチでも警告する
+  - 導入先の改変の「元になった上流版」は上流の git 履歴（リネームもさかのぼる）から推定する（歴代の版のうち行の差が最小のもの）。これで `.dd-manifest` が不要になり、導入先に何も書かずに済む
+  - fork は全ファイル分まとめて数回（`git log` / `git cat-file --batch` / `awk` を各1回）。ファイル数に比例するのは差分表示の `diff` だけ。配布済み25リポジトリで実測 1.7〜4.6秒、全リポジトリでファイルの変化なし
+  - 配布済みの呼び出し口（`scripts/dd-update.sh`）は dd-know-how 側の本体を exec するだけなので、導入先での作業なしに全リポジトリが新しい動作になる。名前は互換のため据え置き（スタブはコメントのみ更新）
+  - `/dd` スキルの更新手順（ファイルごとにユーザーへ確認）・`/setup`・README・IMPORT.md・`templates/scripts/README.md`・`doc/UPGRADE-NOTICE.md`（v8 手順と旧手順の読み替え）を更新
 - **`doc-check.sh` の fork 除去 — 完了ゲートとして使える速度に戻した**（利用先実測: 87ファイルで50秒 / 1300ファイルで20分規模 → **2.2秒**。出力は旧版とバイト単位で一致し、孤児・リンク切れ・終了コードも同一であることを新旧比較で確認）
   - 原因は Windows + Git Bash の fork コスト（**実測 約0.3秒/回**）。ファイル1件ごとに `grep -qF` を2〜3回と `dirname` を呼んでいたため、件数に比例して分〜十分規模まで悪化していた。`dd-index-gen.sh` が先に解決した問題（`$(basename)` の除去）と同根
   - ファイル列挙を `find` → `git ls-files --cached --others --exclude-standard` に変更。**`.gitignore` を尊重するため `node_modules` 等の依存物が構造的に入らない**（実測した利用先では `doc/` 配下 .md 1309件のうち **1275件が node_modules** で、97%が無駄な走査だった）。git 管理外のリポでは `find` へ退避する
@@ -111,6 +120,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - 代替案・リスク・失敗シナリオ・保守性を検討
 
 ### Removed
+- **`dd-update.sh` の一括取り込み・`--adopt-content`・`.dd-manifest` の生成**（v8。差分レポート専用化に伴う。`--adopt-content` を付けるとエラーで止まり、`--dry-run` は受け付けて無視する。導入先に残った `.dd-manifest` は削除してよい）
 - **dd-auto スキル廃止**: 正本に未収載のまま一部利用先（minecraft_creator / nanairo-workspace / spreadjs）に存在した自動完走スキル（起票=Fable → 実装=Opus → Codexレビューをサブエージェントへ自動振り分け）は、v7 の運用（1モデルで完走＋人間がレビューを都度ゲート）と矛盾するため、正本へ取り込まず廃止。スキル本体に加え `.claude/agents/dd-drafter.md` / `dd-implementer.md` も削除対象。手順は `doc/UPGRADE-NOTICE.md` v7 を参照
 
 ### Fixed

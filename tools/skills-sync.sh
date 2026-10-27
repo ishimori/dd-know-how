@@ -4,7 +4,7 @@
 #
 # 正本は .claude/skills/ のみ。.agents/skills/ は Codex がスキルを読むための
 # 生成物であり、直接編集しない（編集しても本スクリプトで上書きされる）。
-# 配布（dd-update-core.sh / setup）も常に正本からコピーするため、
+# 配布（setup）と差分レポート（dd-update-core.sh）も常に正本を基準にするため、
 # このミラーは dd-know-how リポジトリを直接 Codex で開く人のためにある。
 #
 # 使い方:

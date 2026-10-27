@@ -28,7 +28,7 @@ ARCHIVE_DIR="doc/archived/DD"
 # doc-check.sh が走査するドキュメントルート（DOC-MAP.md のある場所）
 DOC_DIR="doc"
 
-# （任意）dd-update.sh が参照する dd-know-how の場所。
+# （任意）dd-update.sh（差分レポート）が参照する dd-know-how の場所。
 # 省略時はプロジェクトの兄弟ディレクトリ ../dd-know-how を使う
 # SOURCE_REPO="C:/repo/dd-know-how"
 
