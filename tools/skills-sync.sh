@@ -35,7 +35,7 @@ while IFS= read -r -d '' f; do
         else
             mkdir -p "$(dirname "$dst")"
             cp "$f" "$dst"
-            echo "  + .agents/skills/$rel（更新）"
+            echo "  + .agents/skills/${rel}（更新）"
         fi
     fi
 done < <(find "$SRC" -type f -print0)
@@ -47,10 +47,10 @@ if [ -d "$DST" ]; then
         if [ ! -f "$SRC/$rel" ]; then
             drift=$((drift + 1))
             if [ "$CHECK" -eq 1 ]; then
-                echo "ORPHAN: $rel（正本に存在しない）"
+                echo "ORPHAN: ${rel}（正本に存在しない）"
             else
                 rm "$f"
-                echo "  - .agents/skills/$rel（正本に無いため削除）"
+                echo "  - .agents/skills/${rel}（正本に無いため削除）"
             fi
         fi
     done < <(find "$DST" -type f -print0)

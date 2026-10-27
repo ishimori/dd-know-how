@@ -19,9 +19,15 @@
 # 導入先の改変の「元になった上流版」は、上流の歴代の版のうち行の差が最も小さいものを推定値とする。
 # 比較の基準は dd-know-how のコミット済みの内容（HEAD）。作業ツリーの未コミット変更は使わない。
 #
+# 推定の限界: 上流が導入先の改変を取り込み、同じコミットでさらに手を加えると、導入先のファイルは
+#   最新版に最も近くなり「ローカルだけ変更」と出る（差分の - 行が、導入先に無い上流の追加分）。
+#   上流へ還元するときは、まず導入先の改変をそのまま1コミットで入れ、追加の変更は別コミットにする。
+#   こうすると導入先は「上流だけ変更（導入先 = 還元コミットの版）」と正しく判定される。
+#
 # 改修時の注意: ループの中で外部コマンドを呼ばない（Windows + Git Bash は fork 1回が最大 約0.3秒）。
 #   上流の履歴（git log）・歴代の版の中身（git cat-file --batch）・比較（awk）は全ファイル分を各1回で行う。
 #   ファイル数に比例する fork は、差分表示の diff だけにとどめる。
+#   変数の直後に全角文字が続くときは ${VAR} と書く（macOS の bash は全角の先頭バイトを変数名に含めうる）。
 # =============================================================================
 set -euo pipefail
 
@@ -256,7 +262,7 @@ while IFS= read -r rec; do
     if [ "$tag" = DUP ]; then
         first="${rest#*$'\t'}"
         dups_of[$first]="${dups_of[$first]:-}$dst"$'\n'
-        add_name "${cat_of[$first]:-SAME}" "$dst（$first と同じ内容）"
+        add_name "${cat_of[$first]:-SAME}" "${dst}（$first と同じ内容）"
         continue
     fi
     cat_of[$dst]="$tag"
@@ -282,7 +288,7 @@ print_commits() {  # print_commits "<コミット 日付 件名>\037..."
 dup_note() {  # dup_note 導入先パス — 同じ内容の複製があれば知らせる
     local d
     while IFS= read -r d; do
-        if [ -n "$d" ]; then echo "- 同じ内容のファイル: $d（取り込むなら同じように反映する）"; fi
+        if [ -n "$d" ]; then echo "- 同じ内容のファイル: ${d}（取り込むなら同じように反映する）"; fi
     done <<< "${dups_of[$1]:-}"
     return 0
 }
@@ -307,10 +313,10 @@ list_names() {  # list_names 見出し 表示名...
 
 # --- レポート ---
 echo "# DD配布物の差分レポート: $TARGET"
-echo "- 上流: $KH（$KH_HEAD）"
+echo "- 上流: ${KH}（${KH_HEAD}）"
 echo "- このスクリプトはファイルを一切変更しません。改行コードの違いは無視し、上流はコミット済みの内容（HEAD）と比べます"
 if [ "$KH_BRANCH" != "main" ] && [ "$KH_BRANCH" != "master" ]; then
-    echo "  ⚠️ dd-know-how が main 以外のブランチ（$KH_BRANCH）です。配布の基準として正しいか確認してください"
+    echo "  ⚠️ dd-know-how が main 以外のブランチ（${KH_BRANCH}）です。配布の基準として正しいか確認してください"
 fi
 if [ ${#kh_dirty[@]} -gt 0 ]; then
     echo "  ⚠️ dd-know-how の作業ツリーに未コミットの変更があります（比較には使っていません）: ${!kh_dirty[*]}"
@@ -342,7 +348,7 @@ if [ ${#r_up[@]} -gt 0 ]; then
         IFS=$'\t' read -r _ dst src k vh vd newer <<< "$rec"
         echo ""
         echo "### $dst"
-        echo "- 導入先 = 上流 $vh（$vd）の版。その後の上流の変更:"
+        echo "- 導入先 = 上流 ${vh}（${vd}）の版。その後の上流の変更:"
         print_commits "$newer"
         cp_lines "$src" "$dst"
         show_diff "$T/$k.local" "$T/$k.head" "local/$dst" "upstream@$H/$src"
@@ -357,14 +363,14 @@ if [ ${#r_both[@]} -gt 0 ]; then
         echo ""
         echo "### $dst"
         dup_note "$dst"
-        echo "- 元になった上流版（推定）: $bh（$bdate）。そこからの導入先の改変は約 ${bd} 行"
+        echo "- 元になった上流版（推定）: ${bh}（${bdate}）。そこからの導入先の改変は約 ${bd} 行"
         if [ $((bd * 2)) -gt "$n" ]; then
             echo "  ⚠️ 改変が全体の半分を超えるため、元になった版の推定は当てになりません"
         fi
         echo "- その後の上流の変更:"
         print_commits "$newer"
         echo ""
-        echo "反映すべき上流の変更（$bh → $H）:"
+        echo "反映すべき上流の変更（$bh → ${H}）:"
         show_diff "$T/$k.base" "$T/$k.head" "upstream@$bh/$src" "upstream@$H/$src"
         echo ""
         echo "残すべき導入先の改変（$bh → 現在のファイル）:"

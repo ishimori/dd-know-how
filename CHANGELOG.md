@@ -11,6 +11,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - `templates/scripts/dd-index-gen.sh`: `set -u` の bash 3.2 では、空配列の `"${arr[@]}"` 展開が unbound variable になる。アーカイブ0件（またはアクティブ0件）だと `head` の引数でこれが起き、しかもパイプの左側なので止まらない。結果として、**DDが1件も載っていない DD-INDEX.md を書いて「updated」と正常終了**していた。空の配列は引数に展開しないよう分岐する
   - `templates/scripts/dd-health.sh`: 見出しの `（$TODAY）` を `（${TODAY}）` に。macOS の bash では、変数名の直後に続く全角文字の先頭バイトが変数名の一部と解釈されうる（利用先で実際に直されていた箇所。Linux の bash 3.2 では再現しない）
   - 検証: bash 3.2.57（Docker の `bash:3.2`）と bash 5.3 で、アクティブのみ・アーカイブのみ・両方の3ケースを実行。旧版は bash 3.2 のアクティブのみ・アーカイブのみで空の索引を書いた。新版は3ケースとも bash 3.2 と 5.3 の DD-INDEX.md が一致し、bash 5.3 では旧版の出力とも一致（既存環境の挙動は変わらない）
+  - 同根パターンの横展開（別コミット）: 変数の直後に全角文字が続く残り13行を `${VAR}` に（配布物の `dd-health.sh` 2行・`dd-index-gen.sh` 1行、dd-know-how 側の `tools/dd-update-core.sh` 7行・`tools/skills-sync.sh` 3行）。空配列の展開はほかに無いことを確認（いずれも件数で分岐済み）。修正前後で出力がバイト単位で一致することを確認
+  - 還元を2コミットに分けた理由を `tools/dd-update-core.sh` のヘッダに明記: 利用先の改変をそのまま1コミットで入れてから追加の変更を重ねると、利用先の差分レポートは「上流だけ変更」と正しく判定される（同じコミットで手を加えると「ローカルだけ変更」に見えてしまう）
 - **`/dd` スキルの新規作成手順が、導入先に存在しないパスを指していた**（利用先3リポで実測確認）
   - `IMPORT.md` はテンプレートを `doc/templates/` へ配置させる（`cp dd-know-how/templates/*.md doc/templates/`）のに、配布される `SKILL.md` は `templates/guides.md` / `templates/dd_template.md` を Read せよと書いていた。このパスが存在するのは dd-know-how 自身だけで、**導入先では必ず Read に失敗する**（同スキルは「Read に失敗したらエラーとして停止」と定めているため、DD新規作成が止まる）
   - 導入先の実態に合わせて `doc/templates/...` へ修正。利用先の1リポは既に同じ内容へローカル改変しており、その手当てを上流へ還元した形

@@ -66,7 +66,7 @@ INDEX_FILE="$DD_DIR/DD-INDEX.md"
 # --- Validate directories ---
 if [ ! -d "$DD_DIR" ]; then
     {
-        echo "ERROR: DDフォルダが見つかりません: $DD_DIR（基準: $PROJECT_ROOT）"
+        echo "ERROR: DDフォルダが見つかりません: ${DD_DIR}（基準: ${PROJECT_ROOT}）"
         echo "  対処: プロジェクトルート直下に .dd-config を作成し、実パスを設定してください。例:"
         echo '    DD_DIR="doc/DD"'
         echo '    ARCHIVE_DIR="doc/archived/DD"'
