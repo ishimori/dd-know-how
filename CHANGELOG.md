@@ -12,6 +12,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - README: 冒頭の規模の記述（「数百件規模」）を実態に合わせ、「開発の流れ」の後に要約の節を追加
 
 ### Fixed
+- **配布物が、導入先に存在しないファイルを指していた**（新規リポジトリへの Level 2 導入で発見。未改変の導入で `doc-check.sh` が ERROR 2件で失敗していた）
+  - `templates/DOC-MAP.md`: オプションの Lintヒント基盤の行が「リンク切れ」、Level 2 で配置する `doc/spec-sync-check.md` が「孤児」になっていた。Lint の行に「未作成」を明記し（`doc-check.sh` はこの語を含む行を読み飛ばす）、`doc/spec-sync-check.md` の行を追加
+  - `templates/guides.md` §10: 完了報告の記載内容を、導入先に配布されない `doc/development-flow.md` への参照から本文へ移した（§1「DDを作るか」と同じ扱い。`doc/development-flow.md` には正本が guides.md §10 であることを明記）
+  - `/setup`: 完了報告の「次のステップ」が、導入先に無い `development-flow.md` を案内していた。`{テンプレートパス}/guides.md` に変更（ミラー同期済み）
+  - `templates/dd_template.md`・`doc/da-method.md`: dd-know-how の中にしかない `templates/guides.md` だけを指していたので、どちらの配置でも辿れる書き方に修正（テンプレートは「このファイルと同じフォルダの guides.md」、`da-method.md` は導入先のパスを併記）。`/dd` スキルで直した不具合と同根
+  - `templates/coding-standards.md`: `lint/` を「同じテンプレートフォルダ内に同梱」と書いていたが、オプションのため未導入の導入先には無い。dd-know-how の `templates/lint/` にあると修正
+  - 検証: 修正後の配布物で Level 2 の構成を再現し、Lint 基盤なし・ありの両方で `doc-check.sh` が終了コード 0。修正前は ERROR 2件で終了コード 1
+  - 導入先での扱い: いずれも文書の変更で、取り込みは任意。`bash scripts/dd-update.sh` の差分レポートでは `guides.md`・`dd_template.md`・`coding-standards.md`・`da-method.md` が「上流だけ変更」として表示される。`DOC-MAP.md` は導入時に調整する実体で比較対象外のため、既存の導入先には届かない
 - **bash 3.2（macOS 標準の /bin/bash）で DD-INDEX が空になる不具合を修正**（利用先案件のローカル修正を上流還元。v8 の差分レポートで「ローカルだけ変更」として見つかったもの）
   - `templates/scripts/dd-index-gen.sh`: `set -u` の bash 3.2 では、空配列の `"${arr[@]}"` 展開が unbound variable になる。アーカイブ0件（またはアクティブ0件）だと `head` の引数でこれが起き、しかもパイプの左側なので止まらない。結果として、**DDが1件も載っていない DD-INDEX.md を書いて「updated」と正常終了**していた。空の配列は引数に展開しないよう分岐する
   - `templates/scripts/dd-health.sh`: 見出しの `（$TODAY）` を `（${TODAY}）` に。macOS の bash では、変数名の直後に続く全角文字の先頭バイトが変数名の一部と解釈されうる（利用先で実際に直されていた箇所。Linux の bash 3.2 では再現しない）

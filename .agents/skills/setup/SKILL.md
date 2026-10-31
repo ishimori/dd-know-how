@@ -288,7 +288,7 @@ Lintエラーを「P規約ID + 修正方針」付きでLLMに返し、自己修�
 1. `.claude/settings.json` にHooks設定を追加（ステップ5参照、Level 2の場合）
 2. Playwright MCP を導入した場合: Claude Code を再起動して有効化
 3. `/dd new 最初のDD` で新規DDを作成
-4. development-flow.md で開発フローを確認
+4. {テンプレートパス}/guides.md で DD の進め方を確認
 5. フロントエンド実装を含む場合: Modern Web Guidance の利用を検討
    （coding-standards.md「補完ツール」セクション参照。npx で直接利用可能）
 6. dd-know-how の更新を取り込むときは、`bash scripts/dd-update.sh` で差分を確認し、必要なファイルだけを1つずつ取り込みます（スクリプトはファイルを変更しない）

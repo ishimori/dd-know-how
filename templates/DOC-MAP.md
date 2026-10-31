@@ -14,15 +14,16 @@
 | ファイル | 説明 |
 |---------|------|
 | `doc/da-method.md` | DA深掘り手法（参考文書 — 設計の岐路・レビュー指示時に使う） |
+| `doc/spec-sync-check.md` | 仕様書同期チェック手順（DDアーカイブ時に使う） |
 | `doc/engineering-patterns.md` | エンジニアリングパターン集（gotcha・定石。DAの同根パターンの昇格先） |
 | `doc/decisions.md` | 意思決定記録（長寿命のアーキテクチャ決定。「なぜこうなってる？」の逆引き） |
 | `doc/templates/coding-standards.md` | コーディング基準書（P規約・採点基準・Lint対応表） |
-| `doc/templates/lint/README.md` | Lintヒント基盤（LintエラーをLLMの自己修正ヒントにする） |
+| `doc/templates/lint/README.md` | Lintヒント基盤（LintエラーをLLMの自己修正ヒントにする。オプション導入時まで未作成） |
 
 ## 仕様書（現在形の正典）
 
 > DD = 変更の記録（フロー）、spec = 現在の姿（ストック）。
-> DDアーカイブ時に同期チェックを行う（手順: spec-sync-check.md、Level 2 で doc/ 直下に配置）。
+> DDアーカイブ時に同期チェックを行う（手順: `doc/spec-sync-check.md`、Level 2 で配置）。
 
 | パス | 説明 |
 |------|------|

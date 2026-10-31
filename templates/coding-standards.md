@@ -70,7 +70,7 @@
 | P22 SQL injection | ruff `S608` | **error** | |
 | P04-P18 他 | — | レビュー依存 | 意味的判断が必要なため Lint 化困難 |
 
-> 上記の設定ファイル実体（ESLint/ruff スニペット・修正ヒント辞書・編集直後フィードバック用 hook）は、同じテンプレートフォルダ内の `lint/` に同梱している。導入手順は `lint/README.md` を参照。Lint エラーには P規約ID と修正方針が付くため、LLM は Lint 出力だけで自己修正できる。
+> 上記の設定ファイル実体（ESLint/ruff スニペット・修正ヒント辞書・編集直後フィードバック用 hook）は、オプションの Lintヒント基盤として dd-know-how の `templates/lint/` にある（導入済みなら同じテンプレートフォルダ内の `lint/`）。導入手順は同フォルダの `README.md` を参照。Lint エラーには P規約ID と修正方針が付くため、LLM は Lint 出力だけで自己修正できる。
 
 ---
 
