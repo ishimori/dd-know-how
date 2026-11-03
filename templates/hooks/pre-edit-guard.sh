@@ -6,18 +6,23 @@
 # 保護対象:
 #   1. ガードレール一式（エージェント設定/フック本体）— LLM が自分のガードを
 #      無効化できないようにする。Claude Code / Codex / .agents の3系統を含む。
-#   2. シークレット（.env 系）
+#   2. シークレット（.env 系。.env.example などの見本は除く）
 #   3. 自動生成ファイル（DD-INDEX.md）
 #
 # パスは判定前に正規化する: バックスラッシュ→スラッシュ、重複スラッシュ・冗長な
-# ./.. の畳み込み（realpath -m）、小文字化。NTFS はケースインセンシティブなので
+# ./.. の畳み込み（realpath -m）、NTFS の代替データストリーム指定（::$DATA 等）の除去、
+# 8.3 形式の短い名前（CLAUDE~1 等）の展開、小文字化。NTFS はケースインセンシティブなので
 # .CLAUDE/... 等の表記ゆれや、実 JSON でエスケープされたバックスラッシュ（\\）を
 # 使ったバイパスを塞ぐ。パターンはすべて小文字で書くこと。
 #
-# 既知の残存リスク（文字列マッチの限界。README のセキュリティ節にも記載）:
+# 既知の残存リスク（文字列マッチの限界。README「同梱ツールキット」のフックの行にも記載）:
+#   - 守るのは Edit / Write だけ。Bash での書き込み（echo > や sed -i など）はこのフックを
+#     通らない。シェルのコマンドは書き方が無数にあり、文字列の判定では塞ぎきれないため追わない。
 #   - シンボリックリンク経由の別名は防げない。
 #   - file_path を抽出できない場合はフェイルオープン（通す）。過剰ブロックによる
 #     ロックアウトを避けるための設計上のトレードオフ。
+#   - 末尾のドット・空白（settings.json. など）は正規化しない。Claude Code（Node）では
+#     その名前の別ファイルができるだけで、本物は書き換わらないため。
 # =============================================================================
 
 INPUT=$(cat)
@@ -39,7 +44,36 @@ fi
 # --- 正規化 ---
 FILE_PATH="${FILE_PATH//\\//}"                                  # バックスラッシュ→スラッシュ
 FILE_PATH=$(printf '%s' "$FILE_PATH" | tr -s '/')              # 重複スラッシュを1つに（realpath非依存の保険）
+
+# NTFS の代替データストリーム指定を外す。file::$DATA はファイル本体を、dir::$INDEX_ALLOCATION
+# （dir:$I30:$INDEX_ALLOCATION）はフォルダそのものを指し、どちらも本物に書き込めるため、
+# 各要素の ':' から先を削ってから判定する。ドライブ文字の ':' は残す（Windows のファイル名に ':' は使えない）
+DRIVE=""
+case "$FILE_PATH" in [A-Za-z]:*) DRIVE="${FILE_PATH:0:2}"; FILE_PATH="${FILE_PATH:2}" ;; esac
+while [[ "$FILE_PATH" == *:* ]]; do
+    REST="${FILE_PATH#*:}"                                      # 最初の ':' より後ろ
+    case "$REST" in */*) REST="/${REST#*/}" ;; *) REST="" ;; esac  # その要素の残りを捨てる
+    FILE_PATH="${FILE_PATH%%:*}${REST}"
+done
+FILE_PATH="${DRIVE}${FILE_PATH}"
+
 FILE_PATH=$(realpath -m "$FILE_PATH" 2>/dev/null || printf '%s' "$FILE_PATH")  # ./.. を畳み込み（失敗時は素通し）
+
+# 8.3 形式の短い名前（.claude → CLAUDE~1 など）を長い名前に戻す。短い名前があるのは Windows だけなので、
+# cygpath（Git Bash）があるときだけ行う（外部コマンドを起動するのは ~数字 を含むパスのときだけ）。
+# cygpath -l は実在する部分しか戻さないため、実在する一番深い親まで戻して変換し、
+# まだ無い部分（これから作るファイルなど）を付け直す
+if [[ "$FILE_PATH" == *"~"[0-9]* ]] && command -v cygpath >/dev/null 2>&1; then
+    LONG_HEAD="$FILE_PATH"; LONG_TAIL=""
+    while [ ! -e "$LONG_HEAD" ] && [[ "$LONG_HEAD" == */* ]]; do
+        LONG_TAIL="/${LONG_HEAD##*/}${LONG_TAIL}"
+        LONG_HEAD="${LONG_HEAD%/*}"
+    done
+    if [ -n "$LONG_HEAD" ]; then
+        FILE_PATH="$(cygpath -m -l "$LONG_HEAD" 2>/dev/null || printf '%s' "$LONG_HEAD")${LONG_TAIL}"
+    fi
+fi
+
 DISPLAY_NAME="${FILE_PATH##*/}"                                 # 表示用（元の大小を維持）
 FILE_PATH=$(printf '%s' "$FILE_PATH" | tr '[:upper:]' '[:lower:]')  # 判定は小文字で行う
 
@@ -56,9 +90,12 @@ case "$FILE_PATH" in
         ;;
 esac
 
-# --- 2. シークレット ---
-case "$FILE_PATH" in
-    *.env|*.env.local|*.env.production)
+# --- 2. シークレット（.env 系をファイル名でまとめて判定） ---
+BASE_NAME="${FILE_PATH##*/}"
+case "$BASE_NAME" in
+    *.example|*.sample|*.template)
+        ;;  # .env.example などの見本（シークレットを含まない前提）は通す
+    .env|.env.*|*.env|.envrc)
         echo "BLOCKED: 環境変数ファイル ($DISPLAY_NAME) の編集は禁止されています。" >&2
         echo "  理由: シークレット保護" >&2
         exit 2

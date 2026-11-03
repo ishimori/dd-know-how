@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Security
+- **編集ガード（`pre-edit-guard.sh`）の抜け道を塞いだ**（新規リポジトリへの導入直後に、自動セキュリティレビューが3件を指摘）
+  - **Windows の別の書き方で、保護対象のファイルに書き込めた**（深刻度: 中）: NTFS の代替データストリーム指定（`settings.json::$DATA`）、フォルダに付ける指定（`.claude::$INDEX_ALLOCATION/settings.json`。検証中に見つけたもの）、8.3 形式の短い名前（`CLAUDE~1/settings.json`・`.claude/SETTIN~1.JSO`）が判定をすり抜け、Node（Claude Code が使う）から本物のファイル・フォルダに書き込めることを実測した。判定の前に、各要素の `:` から先を削り、短い名前は `cygpath -l` で長い名前に戻す。`cygpath -l` は実在する部分しか戻さないので、これから作るファイル（`CLAUDE~1/settings.local.json`）は実在する親まで戻して変換する。`~数字` を含むパスを一律に止める方式は採らなかった（パスに短い名前が入る環境、たとえば GitHub Actions の Windows ランナーの一時フォルダ `C:\Users\RUNNER~1\...` では、そこでの編集がすべて止まるため）
+  - **`.env` 系の一部しか守っていなかった**（深刻度: 中）: `.env`・`.env.local`・`.env.production` の3つを並べていたため、`.env.development`・`.env.test`・`.env.production.local` などが通っていた。ファイル名で `.env`・`.env.*`・`*.env`・`.envrc` をまとめて止め、見本（`*.example`・`*.sample`・`*.template`）は通す。旧版で止めていた名前のうち、`app.env.local` のように `.env` で始まらず末尾も `.env` でないものは対象から外れる
+  - **Bash での書き込みはガードを通らない**（深刻度: 中）: フックは Edit / Write にだけ登録するため、`echo > .claude/settings.json` などは判定されない。シェルのコマンドは書き方が無数にあり、文字列の判定では塞ぎきれないので、フックでは追わずに残存リスクとしてフックの冒頭と README に書いた
+  - 指摘にあった末尾のドット・空白（`settings.json.`）は、Node ではその名前の別ファイルができるだけで本物は書き換わらないことを実測したので、正規化していない（理由はフック冒頭の残存リスクの欄）
+  - 検証: Windows のパス48件（止めるべき33件・通すべき15件）を Git Bash（bash 5.3）で、POSIX のパス20件を Git Bash と bash 3.2（Docker の `bash:3.2`）で、新旧のフックに通した。新版は全件が期待どおり。旧版は Windows で20件、POSIX で5件すり抜けた。通常のパスで起動する外部コマンドの数は変わらない（短い名前を含むパスのときだけ `cygpath` を1回起動する）
+  - あわせて、フックの冒頭が指していた README の「セキュリティ節」（実在しない）を「同梱ツールキット」表のフックの行に直し、`doc/dd-skill-architecture.md` の構成図のガードの分岐を現状に合わせた
+  - 導入先での扱い: セキュリティ修正のため取り込み推奨。`bash scripts/dd-update.sh` の差分レポートで `pre-edit-guard.sh` が「上流だけ変更」として表示される。末尾にプロジェクト固有のルールを足している導入先では「両方変更」になるので、上流の変更だけを手で反映する
+
 ### Added
 - **業務アプリ試作プロファイル `templates/prototype/`（任意）** — 業務アプリの試作で毎回伝えていた初期方針を、導入時のオプションにした（`/setup` の 7c と、IMPORT.md の「オプション導入」）。利用先の試作リポジトリでは、同じ方針がそれぞれ別の言い回しで AGENTS.md や画面の規約に書かれていた
   - 内容: 画面の既定値 `ui-guidelines.md`（一覧から詳細へは画面遷移。詳細から前後へ移れる・一覧へ戻ると元の位置に戻る・余白でなく情報量）、AGENTS.md への追記ブロック `agents-block.md`（MVP の品質、L1=要件・L2=基本設計の文書、DB の正はスキーマで ER図とDB定義書はそこから生成、画面規約への入口）、L1/L2 の README と DOC-MAP の節（手順は `README.md`）

@@ -165,8 +165,8 @@ flowchart TD
         PE["Edit / Write 呼び出し"]
         PE --> PG["pre-edit-guard.sh"]
         PG --> CHK1{"対象ファイルは？"}
-        CHK1 -- "settings.json\nsettings.local.json" --> BLOCK1["❌ ブロック\nHook設定の改竄防止"]
-        CHK1 -- ".env / .env.local\n.env.production" --> BLOCK2["❌ ブロック\nシークレット保護"]
+        CHK1 -- "settings*.json / hooks/\n.dd-config" --> BLOCK1["❌ ブロック\nガードレールの改竄防止"]
+        CHK1 -- ".env 系\n（.env.example 等の見本は除く）" --> BLOCK2["❌ ブロック\nシークレット保護"]
         CHK1 -- "DD-INDEX.md" --> BLOCK3["❌ ブロック\n自動生成ファイル保護"]
         CHK1 -- "その他" --> PASS1["✅ 通過"]
     end

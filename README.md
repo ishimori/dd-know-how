@@ -235,7 +235,7 @@ doc/DD/DD-042_xxx.md   ──archive──▶   doc/spec/          仕様書（�
 | **別モデル・クロスレビュー**（任意・人間が都度指示） | 実装差分を別モデル（Codex）に監査させ、仕様/権限/テスト漏れを findings 優先で検出。サブスク認証CLIをヘッドレス実行し**API課金なし・read-only**。DDタスクには組み込まず、ユーザーの指示で実行（[templates/scripts/codex-review.sh](templates/scripts/codex-review.sh)） |
 | **AGENTS.md / CLAUDE.md スニペット** | AGENTS.md（正本・50行程度）+ CLAUDE.md（`@AGENTS.md` インポート1行のポインタ）。内容を二重管理せず Claude Code / Codex の両方が同じ指示を読む |
 | **Playwright MCP 設定** | プロジェクトスコープの `.mcp.json`。プラグイン非対応環境（VSCode拡張等）でも動く |
-| **フック** | 重要ファイル編集ガード / アーカイブ時のINDEX更新リマインダー / 編集直後Lint。編集ガードはガードレール一式（エージェント設定・フック本体・`.dd-config`）を保護し、パスは正規化（区切り文字・大小・冗長表現）してから判定する。`.dd-config` は `source` せず厳格抽出するため設定ファイル経由のコード実行は起きない。残存リスク: シンボリックリンク別名の編集は防げず、パス抽出不可時はフェイルオープン（[templates/hooks/pre-edit-guard.sh](templates/hooks/pre-edit-guard.sh) 冒頭に明記） |
+| **フック** | 重要ファイル編集ガード / アーカイブ時のINDEX更新リマインダー / 編集直後Lint。編集ガードはガードレール一式（エージェント設定・フック本体・`.dd-config`）と `.env` 系（`.env.example` などの見本は除く）を保護し、パスは正規化（区切り文字・大小・冗長表現・NTFS の代替データストリーム指定・8.3 形式の短い名前）してから判定する。`.dd-config` は `source` せず厳格抽出するため設定ファイル経由のコード実行は起きない。残存リスク: 守るのは Edit / Write だけで、Bash での書き込みは止めない。シンボリックリンク別名の編集は防げず、パス抽出不可時はフェイルオープン（[templates/hooks/pre-edit-guard.sh](templates/hooks/pre-edit-guard.sh) 冒頭に明記） |
 | **スクリプト** | DD-INDEX 全量再生成 / DOC-MAP 整合性チェック / **DD運用ヘルスチェック**（クローズ漏れ・滞留・ログ形骸化・DA雛形残置・ステータス語彙を静的分析。DD作成直後とアーカイブ前の即時セルフチェックにも使う）。パス設定はルート直下の **`.dd-config`** に一元化し、全スクリプトはCWD非依存（どこから実行してもよく、上書き更新で設定が消えない）。更新は一括で流し込まず、`bash scripts/dd-update.sh` の**差分レポート**（読み取り専用）を見て1ファイルずつ取り込む |
 | **Modern Web Guidance 連携** | フロントエンド実装時に Chrome 公式のモダンWebガイドを `npx` で検索・取得する運用を規約に組み込み済み |
 
