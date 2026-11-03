@@ -156,8 +156,10 @@ function emit(    n, parts, base, i, num, title) {
 }
 FNR == 1 { emit(); reset(); fp = FILENAME }
 { sub(/\r$/, "") }
-# ヘッダ表の値行（| 作成日 | 更新日 | ステータス |）
-FNR <= 8 && created == "" && /^\|[ \t]*[0-9]{4}-[0-9]{2}-[0-9]{2}/ {
+# ヘッダ表の値行（| 作成日 | 更新日 | ステータス |）。先頭12行まで見る — dd-index-gen.sh と
+# KANBANビューアも12行。ここだけ8行だと、9〜12行目にある表を索引は読めるのに本スクリプトは
+# 「ステータス未設定」と誤報していた
+FNR <= 12 && created == "" && /^\|[ \t]*[0-9]{4}-[0-9]{2}-[0-9]{2}/ {
     split($0, f, "|")
     created = trim(f[2]); updated = trim(f[3]); status = trim(f[4])
 }
